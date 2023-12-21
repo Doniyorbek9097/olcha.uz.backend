@@ -4,5 +4,7 @@ module.exports = routes = [
     require("./product.route"),
     require("./carousel.route"),
     require("./shop.route"),
-    require("./cart.route")
+    require("./cart.route"),
+    require("./color.route"),
+    require("./brend.route")
 ];

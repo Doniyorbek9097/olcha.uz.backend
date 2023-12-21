@@ -13,14 +13,8 @@ const Schema = mongooose.Schema({
     },
 
     slug: {
-        uz: {
-            type:String,
-            default:""
-        },
-        ru: {
-            type:String,
-            default:""
-        }
+        type:String,
+        required:true
     },
 
     discription: {
@@ -45,10 +39,18 @@ const Schema = mongooose.Schema({
         }
     },
 
-    properteis: {
-        type:Array,
-        default:[{uz:"", ru:""}]
-    },
+    properteis: [
+        {
+            uz: {
+                type: String,
+                default: ""
+            },
+            ru: {
+                type: String,
+                default: ""
+            }
+        }
+    ],
 
 
     countInStock: {
@@ -88,7 +90,7 @@ const Schema = mongooose.Schema({
 
     quantity: {
         type:Number,
-        required:true
+        default:0
     },
 
     sold: {
@@ -149,12 +151,10 @@ const Schema = mongooose.Schema({
     brend: {
         name: {
             type:String,
-            required:true
         },
     
         image: {
             type:String,
-            required:true
         },
     
         discription: {
@@ -198,6 +198,7 @@ const Schema = mongooose.Schema({
 }
 
 );
+
 
 
 module.exports = mongooose.model("Product", Schema);

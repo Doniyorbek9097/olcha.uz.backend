@@ -7,7 +7,7 @@ module.exports = ({email, subject, html}) => {
             host: 'smtp.gmail.com',
             secure:true,
             port:587,
-            proxy:'http://127.0.0.1:54372',
+            proxy:'http://127.0.0.1:63138',
             auth: {
                 user: process.env.EMAIL,
                 pass: process.env.EMAIL_PASSWORD,

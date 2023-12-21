@@ -25,7 +25,7 @@ router.get("/carousel", async(req,res) => {
             slug: item.slug[lang]
         }));
         
-       return res.json({result});
+       return res.json(result);
     } catch (error) {
         console.log(error)
     }

@@ -5,26 +5,29 @@ const bcrypt  = require("bcrypt");
 const userSchema = new mongooose.Schema({
     firstname: {
         type:String,
-        required:true
     },
     lastname: {
         type:String,
+    },
+
+    username: {
+        type: String,
         default:""
     },
-    phone: {
-        type:Number,
+
+    phone_number: {
+        type:String,
         required:true
     },
     password: {
         type:String,
-        required:true
     },
-    email: {
-        type: String,
-        unique: true,
-        index: true,
-        lowarcase: true
-    },
+    // email: {
+    //     type: String,
+    //     unique: true,
+    //     index: true,
+    //     lowarcase: true
+    // },
 
     isBlocked: {
         type: Boolean,
@@ -59,18 +62,26 @@ userSchema.set("toJSON", { virtuals: true });
 
 userSchema.methods.generateToken = async function () {
     const token = jwt.sign(
-        {_id: this._id, email: this.email},
-        process.env.JWT_PASSWORD,
+        {   _id: this._id, 
+            phone_number: this.phone_number
+        },
+        process.env.JWT_SECRET_KEY,
         {expiresIn:"7d"}
-        );
+    );
 
     return token;
 }
 
 
 userSchema.pre("save", async function(next) {
-   const salt = await bcrypt.genSalt(10);
-   this.password = await bcrypt.hash(this.password, salt)
+    if(this.password) {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt)
+    }
+
+    if(this.firstname && this.lastname) {
+        this.username = `${this.firstname}_${this.lastname}`;
+    }
 });
 
 

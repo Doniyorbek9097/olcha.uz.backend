@@ -1,31 +1,51 @@
-const mongooose = require("mongoose");
+const mongoose = require("mongoose");
 
-const Schema = mongooose.Schema({
+const Schema = mongoose.Schema({
     name: {
         uz: {
-            type:String,
-            default:""
+            type: String,
+            default: ""
         },
         ru: {
-            type:String,
-            default:""
+            type: String,
+            default: ""
         }
     },
 
     image: {
-        public_id:String,
-        url:String
+        public_id: String,
+        url: String
+    },
+
+    top_banner: {
+        uz: [
+            {
+                type: String
+            }
+        ],
+
+        ru: [
+            {
+                type: String
+            }
+        ]
+    },
+
+    left_banner: {
+        uz: {
+            type: String,
+            default: ""
+        },
+
+        ru: {
+            type: String,
+            default: ""
+        }
     },
 
     slug: {
-        uz: {
-            type:String,
-            default:""
-        },
-        ru: {
-            type:String,
-            default:""
-        }
+        type: String,
+        required: true
     },
 
     icon: {
@@ -33,24 +53,30 @@ const Schema = mongooose.Schema({
     },
 
     parentId: {
-        type:String
+        type: mongoose.Schema.Types.ObjectId,
+        default: null
     },
 
     createdBy: {
-        type:mongooose.Schema.Types.ObjectId,
-        ref:"User"
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     }
 },
 
-{timestamps:true}
+    { timestamps: true }
 
 );
-
 
 
 Schema.set("toObject", { virtuals: true });
 Schema.set("toJSON", { virtuals: true });
 
+Schema.virtual("products", {
+    "ref": "Product",
+    localField: "_id",
+    foreignField: "parentCategory",
+})
 
 
-module.exports = mongooose.model("Category", Schema);
+
+module.exports = mongoose.model("Category", Schema);

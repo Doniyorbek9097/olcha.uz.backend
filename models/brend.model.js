@@ -2,13 +2,35 @@ const mongooose = require("mongoose");
 
 const brendSchema = mongooose.Schema({
     name: {
-        type:String,
-        required:true
+        type: String,
+        default: ""
+    },
+
+    slug: {
+        type: String,
+        default:""
+    },
+
+    title: {
+        uz: {
+            type: String,
+            default: ""
+        },
+
+        ru: {
+            type: String,
+            default: ""
+        }
     },
 
     image: {
+        type: String,
+        default:""
+    },
+
+    logo: {
         type:String,
-        required:true
+        default:""
     },
 
     discription: {

@@ -1,43 +1,84 @@
 const cartModel = require("../models/cart.model");
 const router = require("express").Router();
-const mogoose = require("mongoose")
-router.post("/add-cart", async(req, res) => {
+const mongoose = require("mongoose")
+const langReplace = require("../utils/langReplace");
+const { checkToken } = require('../middlewares/authMiddleware');
+
+router.post("/add-cart", async (req, res) => {
     try {
-        let result = await cartModel.find();
-        result = result.find(cart => cart.products.toString() == req.body.products.toString());
-        if(result) {
-            console.log(result)
-          return await cartModel.updateOne({quantity:req.body.quantity});
+        const { products: { product, quantity }, user: userId, cart_id: cartId } = req.body;
+
+        let cart = await cartModel.findOne({ "_id": cartId });
+
+        // cart not found 
+        if (!cart) {
+            const data = await cartModel(req.body).save();
+            return res.status(201).json(data);
         }
-         
-        result = await cartModel(req.body).save();
-        
-    
-        res.json({result});
+        cart.user = userId;
+        const cartProduct = cart.products.findIndex(item => item.product.toString() === product.toString());
+        if (cartProduct === -1) {
+            cart.products.push({...req.body.products});
+        } else {
+            cart.products = cart.products.map(item => {
+                if (item.product.toString() === product.toString()) {
+                        item.quantity = quantity;
+                    }
+
+                return item;
+            });
+        }
+
+
+        const data = await cart.save();
+        return res.status(200).json(data);
+
     } catch (error) {
         console.log(error)
     }
 });
 
-router.get("/cart", async(req, res) => {
+router.get("/cart/:id",  async (req, res) => {
     try {
-        const result = await cartModel.find().populate("products")
-        res.json(result);
+
+        const lang = req.headers['lang'];
+        let cart = await cartModel.findOne({_id:req.params.id})
+            .populate("user")
+            .populate("products.product");
+
+        if (cart) {
+            cart = JSON.stringify(cart);
+            cart = JSON.parse(cart);
+
+            cart.products = cart.products.map(item => {
+                item.product = langReplace(item.product, lang);
+                return item;
+            });
+
+           return res.status(200).json(cart);
+
+        }
+
+        return res.status(404).json("not found");
     } catch (error) {
         console.log(error)
     }
-})
+});
 
 
-router.get("/cart/:id", async(req, res) => {
+
+
+
+router.delete("/cart-delete/:id/:product_id", async (req, res) => {
     try {
-        let result = await cartModel.find();
-        result = result.find(cart => cart.products.toString() == req.params.id.toString());
-        return res.json(result);
+        const cart = await cartModel.findById(req.params.id);
+       const productIndex = cart.products.findIndex(item => item.product._id.toString() === req.params.product_id.toString());
+       cart.products.splice(productIndex, 1);
+       await cart.save();
+       return res.json(cart)
     } catch (error) {
         console.log(error)
     }
-})
-
+});
 
 module.exports = router;

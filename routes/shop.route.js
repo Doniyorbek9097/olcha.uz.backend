@@ -5,7 +5,7 @@ const router = require("express").Router();
 
 router.post("/shop", async(req,res) => {
     try {
-        req.body.slug = slugify(req.body.name);
+        req.body.slug = slugify(req.body.slug);
         const result = await new shopModel(req.body).save();
         res.json({result})
     } catch (error) {
