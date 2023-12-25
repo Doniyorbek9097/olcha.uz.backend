@@ -12,15 +12,8 @@ const brendSchema = mongooose.Schema({
     },
 
     title: {
-        uz: {
-            type: String,
-            default: ""
-        },
-
-        ru: {
-            type: String,
-            default: ""
-        }
+        type: String,
+        required: true
     },
 
     image: {
@@ -34,14 +27,19 @@ const brendSchema = mongooose.Schema({
     },
 
     discription: {
+        type: String,
+        required:true
+    },
+
+    languages: {
         uz: {
-            type:String,
-            default:""
+            title: String,
+            discription: String
         },
 
         ru: {
-            type:String,
-            default:""
+            title: String,
+            discription: String
         }
     }
 });

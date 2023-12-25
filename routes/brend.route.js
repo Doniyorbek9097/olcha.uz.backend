@@ -5,7 +5,9 @@ const router = require("express").Router();
 
 router.get("/brends", async (req, res) => {
     try {
-        const brends = await brendModel.find();
+        const lang = req.headers["lang"];
+
+        const brends = await brendModel.aggregate()
         return res.status(200).json(brends);
     } catch (error) {
         console.log(error);
