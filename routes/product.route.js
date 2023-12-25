@@ -10,7 +10,6 @@ router.post("/product", async (req, res) => {
         req.body.slug = slugify(req.body.name.uz);
         const savedproduct = await new productModel(req.body);
         const imgIndex =  savedproduct.images.indexOf(savedproduct.mainImage);
-        console.log(imgIndex);
         savedproduct.images.splice(imgIndex, 1);
         savedproduct.images.unshift(savedproduct.mainImage);
         const data = await savedproduct.save();
@@ -25,13 +24,13 @@ router.post("/product", async (req, res) => {
 router.get("/products", async (req, res) => {
     try {
         let lang = req.headers['lang'];
-        let products = await productModel.find({}, {[`name${lang}.price`]:1});
-        console.log(products);
-        // if(products.length == 0) return res.json([]);
-        // products = JSON.stringify(products);
-        // products = JSON.parse(products);
-        // if (!lang) return res.json( products );
-        // products = langReplace(products, lang);
+        let products = await productModel.find();
+        
+        if(products.length == 0) return res.json([]);
+        products = JSON.stringify(products);
+        products = JSON.parse(products);
+        if (!lang) return res.json( products );
+        products = langReplace(products, lang);
         return  res.json( products );
     } catch (error) {
         console.log(error)

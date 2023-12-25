@@ -28,7 +28,7 @@ router.post("/signup", async (req, res) => {
         return res.status(200).json("OTP send successfully");
 
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
     }
 });
 
