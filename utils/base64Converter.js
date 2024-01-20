@@ -28,6 +28,8 @@ exports.base64Converter = function (req, base64) {
     const base64Image = base64.substring(base64Index)
     if(base64Index !== 7)
     fs.writeFileSync(filePath, Buffer.from(base64Image, 'base64'))
+    console.log(req.protocol)
+    console.log(req.headers.host)
     return  {
         path: filePath,
         url: `${req.protocol}://${req.headers.host}/uploads/${filename}`

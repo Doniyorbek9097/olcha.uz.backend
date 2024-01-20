@@ -11,7 +11,7 @@ const fs = require("fs");
 // Create new Category 
 router.post("/category", async (req, res) => {
 const {name, image, icon, left_banner, top_banner } = req.body;
-
+    console.log(image)
     req.body.slug = slugify(name.uz);
     image && (req.body.image = base64Converter(req, image)?.url);
 
