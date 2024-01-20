@@ -16,7 +16,7 @@ const Schema = mongoose.Schema({
 
     left_banner: [
         {
-            name: {
+            image: {
                 uz: String,
                 ru: String,
             },
@@ -27,7 +27,7 @@ const Schema = mongoose.Schema({
 
     top_banner: [
         {
-            name: {
+            image: {
                 uz: String,
                 ru: String,
             },
