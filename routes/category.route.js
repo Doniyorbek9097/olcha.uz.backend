@@ -160,7 +160,7 @@ router.delete("/category/:id", async (req, res) => {
         }
         
 
-        if(left_banner.length) {
+        if(left_banner?.length) {
             for (const banner of left_banner) {
                 const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
                 const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
@@ -169,7 +169,7 @@ router.delete("/category/:id", async (req, res) => {
             }
         }
         
-        if(top_banner.length) {
+        if(top_banner?.length) {
             for (const banner of top_banner) {
                 const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
                 const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
