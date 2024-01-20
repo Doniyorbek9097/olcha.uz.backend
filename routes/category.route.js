@@ -152,35 +152,32 @@ router.delete("/category/:id", async (req, res) => {
 
         const deleted = await categoryModel.findByIdAndDelete(req.params.id);
 
-        let { image, icon, left_banner, top_banner } = deleted;
+        let { image, left_banner, top_banner } = deleted;
 
         if (image) {
             const imagePath = path.join(__dirname, `../uploads/${path.basename(image)}`);
             fs.unlink(imagePath, (err) => err && console.log(err));
         }
+        
 
-        if (icon) {
-            const iconPath = path.join(__dirname, `../uploads/${path.basename(icon)}`);
-            fs.unlink(iconPath, (err) => err && console.log(err));
-        }
-
-        for (const banner of left_banner) {
-            if (banner) {
+        if(left_banner.length) {
+            for (const banner of left_banner) {
                 const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
                 const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
                 fs.unlink(bannerUzPath, (err) => err && console.log(err));
                 fs.unlink(bannerRuPath, (err) => err && console.log(err));
             }
         }
-
-        for (const banner of top_banner) {
-            if (banner) {
+        
+        if(top_banner.length) {
+            for (const banner of top_banner) {
                 const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
                 const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
                 fs.unlink(bannerUzPath, (err) => err && console.log(err));
                 fs.unlink(bannerRuPath, (err) => err && console.log(err));
             }
         }
+        
 
 
         res.json({ result: deleted });
