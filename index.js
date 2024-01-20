@@ -15,14 +15,10 @@ app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use("/uploads", express.static("uploads"))
 routes.forEach(route => app.use("/", route));
 
+app.get('/', (req, res) => {
+     res.json(req.protocol+"://"+req.headers.host)
+}) 
 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server is runinng on port ${PORT}`))
-app.get('/', (req) => {
-    resizeBy.json(req.headers.host)
-}) 
-
-const  url = require("url")
-
-console.log()
