@@ -20,7 +20,7 @@ routes.forEach(route => app.use("/", route));
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server is runinng on port ${PORT}`))
 app.get('/', (req) => {
-    console.log(req.app.settings.port)
+    resizeBy.json(req.headers.host)
 }) 
 
 const  url = require("url")
