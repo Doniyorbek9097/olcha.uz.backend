@@ -1,19 +1,72 @@
 const router = require("express").Router();
 const slugify = require("slugify");
-const fs = require("fs");
 const categoryModel = require("../models/category.model");
 const langReplace = require("../utils/langReplace");
 const nestedCategories = require("../utils/nestedCategories");
+const { base64Converter } = require("../utils/base64Converter");
+const resizeImage = require("../utils/resizeImage");
+const path = require("path");
+const fs = require("fs");
 
 // Create new Category 
 router.post("/category", async (req, res) => {
+const {name, image, icon, left_banner, top_banner } = req.body;
+
+    req.body.slug = slugify(name.uz);
+    image && (req.body.image = base64Converter(req, image)?.url);
+
+    if (left_banner && left_banner.length > 0) {
+        for (const banner of left_banner) {
+            banner.name.uz = base64Converter(req, banner.name.uz)?.url;
+            banner.name.ru = base64Converter(req, banner.name.ru)?.url;
+        }
+    }
+
+    if(top_banner && top_banner.length > 0) {
+        for (const banner of top_banner) {
+            banner.name.uz = base64Converter(req, banner.name.uz)?.url;
+            banner.name.ru = base64Converter(req, banner.name.ru)?.url;
+        }
+    }
+
     try {
-        req.body.slug = slugify(req.body.name.uz);
-        
-        const category = await categoryModel(req.body).save();
-        res.json(category)
+        const newCategory = await categoryModel(req.body).save();
+        res.json(newCategory)
+
     } catch (error) {
-        console.log(error)
+        if (error) {
+
+            if (image) {
+                const imagePath = path.join(__dirname, `../uploads/${path.basename(image)}`);
+                fs.unlink(imagePath, (err) => err && console.log(err));
+            }
+
+            if (icon) {
+                const iconPath = path.join(__dirname, `../uploads/${path.basename(icon)}`);
+                fs.unlink(iconPath, (err) => err && console.log(err));
+            }
+
+            for (const banner of left_banner) {
+                if (banner) {
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
+                }
+            }
+
+            for (const banner of top_banner) {
+                if (banner) {
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
+                }
+            }
+
+
+            return res.status(500).json("server ishlamayapti")
+        }
     }
 });
 
@@ -29,27 +82,31 @@ router.get("/category", async (req, res) => {
         let limit = parseInt(req.query.limit) || 10;
         let search = req.query.search || "";
 
-        let categories = await categoryModel.find({
-            slug:{ $regex: search, $options: "i" }
-        }).populate("products");
+        let categories = await categoryModel.find().populate("products")
         let categoryList = nestedCategories(categories);
         categoryList = JSON.stringify(categoryList);
         categoryList = JSON.parse(categoryList);
-        if(!lang) return res.json( categoryList );
+        if (!lang) return res.json(categoryList);
 
         categoryList = langReplace(categoryList, lang);
-        
+
         for (const category of categoryList) {
             category.children = langReplace(category.children, lang);
             category.products = langReplace(category.products, lang);
+            category.left_banner = langReplace(category.left_banner, lang);
+            category.top_banner = langReplace(category.top_banner, lang);
+
             for (const subCategory of category.children) {
                 subCategory.children = langReplace(subCategory.children, lang);
             }
         }
 
-        return res.json( categoryList );
+        return res.json(categoryList);
     } catch (err) {
-        console.log(err);
+        if (err) {
+            console.log(err)
+            res.status(500).json("server ishlamayapti")
+        }
     }
 });
 
@@ -61,16 +118,19 @@ router.get("/category", async (req, res) => {
 router.get("/category/:slug", async (req, res) => {
     try {
         const lang = req.headers["lang"];
-        let category = await categoryModel.findOne({ slug:req.params.slug }).populate("products");
-        if(!lang) return res.json({ result: category });
+        let category = await categoryModel.findOne({ slug: req.params.slug });
+        if (!lang) return res.json({ result: category });
         category = JSON.stringify(category);
         category = JSON.parse(category);
         category = langReplace(category, lang);
         category.products = langReplace(category.products, lang);
-        
-       return res.json(category);
-    } catch (error) {
 
+        return res.json(category);
+    } catch (error) {
+        if (error) {
+            console.log(error);
+            res.status(500).json("server ishlamayapti")
+        }
     }
 })
 
@@ -89,10 +149,45 @@ router.put("/category/:id", async (req, res) => {
 // Delete Category 
 router.delete("/category/:id", async (req, res) => {
     try {
-        const deleted = await categoryModel.findByIdAndDelete(req.params.id);
-        res.json({ result: deleted });
-    } catch (error) {
 
+        const deleted = await categoryModel.findByIdAndDelete(req.params.id);
+
+        let { image, icon, left_banner, top_banner } = deleted;
+
+        if (image) {
+            const imagePath = path.join(__dirname, `../uploads/${path.basename(image)}`);
+            fs.unlink(imagePath, (err) => err && console.log(err));
+        }
+
+        if (icon) {
+            const iconPath = path.join(__dirname, `../uploads/${path.basename(icon)}`);
+            fs.unlink(iconPath, (err) => err && console.log(err));
+        }
+
+        for (const banner of left_banner) {
+            if (banner) {
+                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
+                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                fs.unlink(bannerRuPath, (err) => err && console.log(err));
+            }
+        }
+
+        for (const banner of top_banner) {
+            if (banner) {
+                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
+                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                fs.unlink(bannerRuPath, (err) => err && console.log(err));
+            }
+        }
+
+
+        res.json({ result: deleted });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json("category o'chirib bo'lmadi")
     }
 })
 

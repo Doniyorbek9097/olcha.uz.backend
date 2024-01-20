@@ -1,6 +1,6 @@
-const mongooose = require("mongoose");
+const mongoose = require("mongoose");
 
-const Schema = mongooose.Schema({
+const Schema = mongoose.Schema({
     name: {
         uz: {
             type:String,
@@ -28,17 +28,6 @@ const Schema = mongooose.Schema({
         }
     },
 
-    richDescription: {
-        uz: {
-            type:String,
-            default:""
-        },
-        ru: {
-            type:String,
-            default:""
-        }
-    },
-
     properteis: [
         {
             uz: {
@@ -55,8 +44,7 @@ const Schema = mongooose.Schema({
 
     countInStock: {
         type: Number,
-        min: 0,
-        max: 255
+        min: 1    
     },
 
     price: {
@@ -64,29 +52,19 @@ const Schema = mongooose.Schema({
         required:true
     },
 
-    discount: {
+    totalPrice: {
+        type: Number
+    },
+
+    isDiscount: {
         type:Boolean,
         default:false
     },
 
-    discount_percent: {
+    discountPercent: {
         type:Number
     },
 
-    rating: {
-        type: Number,
-        default: 0,
-    },
-
-    numReviews: {
-        type: Number,
-        default: 0,
-    },
-
-    isFeatured: {
-        type: Boolean,
-        default: false,
-    },
 
     quantity: {
         type:Number,
@@ -98,26 +76,19 @@ const Schema = mongooose.Schema({
         default:0
     },
 
-    color: [
+    colors: [
         {
-            type:mongooose.Types.ObjectId,
-            ref:"Color"
+           name: String,
+           code: String,
+           images: Array
         }
     ],
 
-    size: [
-        {
-            type:mongooose.Types.ObjectId,
-            ref:"Size"
-        }
-    ],
+    size: {
+        type: String,
+    },
    
     
-    mainImage: {
-        type:String,
-        default:""
-    },
-
     images: {
         type:Array,
         default:[]
@@ -126,19 +97,19 @@ const Schema = mongooose.Schema({
     
 
     parentCategory: {
-        type:mongooose.Schema.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"Category",
         required:true
     },
 
     subCategory: {
-        type:mongooose.Schema.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"Category",
         required:true
     },
 
     childCategory: {
-        type:mongooose.Schema.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"Category",
         required:true
     },
@@ -149,45 +120,22 @@ const Schema = mongooose.Schema({
     },
 
     brend: {
-        name: {
-            type:String,
-        },
-    
-        image: {
-            type:String,
-        },
-    
-        discription: {
-            uz: {
-                type:String,
-                default:""
-            },
-    
-            ru: {
-                type:String,
-                default:""
-            }
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Brend"
     },
 
-    shop: {
-        type: mongooose.Schema.Types.ObjectId,
-        ref: "Shop",
-        required:true
-    },
+    // shop: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Shop"
+    // },
 
     seller: {
-        type:mongooose.Schema.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
 
     },
 
-    reviews: [
-        {
-          type:String,
-          ref:"User"   
-        }
-    ],
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
     
 }, 
 
@@ -199,6 +147,14 @@ const Schema = mongooose.Schema({
 
 );
 
+Schema.pre("save", function(next) {
+    if(this.discountPercent) {
+        this.totalPrice = this.price - this.price * this.discount_percent / 100;
+    } 
+
+    next();
+})
 
 
-module.exports = mongooose.model("Product", Schema);
+
+module.exports = mongoose.model("Product", Schema);

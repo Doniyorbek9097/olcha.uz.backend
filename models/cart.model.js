@@ -15,7 +15,7 @@ const cartSchema = mongooose.Schema({
             },
 
             color: {
-                type:String,
+                type: String,
             },
 
             size: {

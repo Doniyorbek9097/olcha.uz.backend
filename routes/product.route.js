@@ -2,21 +2,53 @@ const router = require("express").Router();
 const productModel = require("../models/product.model");
 const slugify = require("slugify");
 const langReplace = require("../utils/langReplace");
-
+const { upload } = require("../middlewares/upload");
+const { uploader } = require("../middlewares/uploader");
+const resizeImage = require("../utils/resizeImage")
+const path = require("path")
+const fs = require("fs");
+const { base64Converter } = require("../utils/base64Converter");
 
 // create new Product 
 router.post("/product", async (req, res) => {
+    req.body.slug = slugify(req.body.name.uz);
+    req.body.images = base64Converter(req, req.body.images).url;
+
+    for (const color of req.body.colors) {
+            color.images = base64Converter(req, color.images).url;
+        }
+        
     try {
-        req.body.slug = slugify(req.body.name.uz);
-        const savedproduct = await new productModel(req.body);
-        const imgIndex =  savedproduct.images.indexOf(savedproduct.mainImage);
-        savedproduct.images.splice(imgIndex, 1);
-        savedproduct.images.unshift(savedproduct.mainImage);
-        const data = await savedproduct.save();
-       return res.status(201).json( data );
+        
+        const newProduct = await new productModel(req.body).save();
+        return res.status(200).json(newProduct);
 
     } catch (error) {
-        console.log(error)
+        if(error) {
+            console.log(error)
+            const { colors, images } = req.body;
+            if(colors.length > 0) {
+                for (const color of colors) {
+                    for (const image of color.images) {
+                        fs.unlink(
+                            path.join(__dirname, `../uploads/${path.basename(image)}`),
+                            (err) => err && console.log(err)    
+                        )
+                    }
+                }
+            }
+
+            if(images.length > 0) {
+                for (const image of images) {
+                    fs.unlink(
+                        path.join(__dirname, `../uploads/${path.basename(image)}`),
+                        (err) => err && console.log(err)    
+                    )
+                }
+            }
+            
+            return res.status(500).json("serverda Xatolik")
+        }
     }
 });
 
@@ -25,13 +57,12 @@ router.get("/products", async (req, res) => {
     try {
         let lang = req.headers['lang'];
         let products = await productModel.find();
-        
-        if(products.length == 0) return res.json([]);
+        if (products.length == 0) return res.json([]);
         products = JSON.stringify(products);
         products = JSON.parse(products);
-        if (!lang) return res.json( products );
+        if (!lang) return res.json(products);
         products = langReplace(products, lang);
-        return  res.json( products );
+        return res.json(products);
     } catch (error) {
         console.log(error)
     }
@@ -44,14 +75,16 @@ router.get("/product/:category", async (req, res) => {
         let lang = req.headers['lang'];
         let categorySlug = req.params.category;
         let products = await productModel.find()
-        .populate("parentCategory")
-        .populate("subCategory")
-        .populate("childCategory")
+            .populate("parentCategory")
+            .populate("subCategory")
+            .populate("childCategory")
+            .populate("brend")
+
         products = products.filter(product => {
-            if(product.parentCategory.slug == categorySlug) return product;
-            if(product.subCategory.slug == categorySlug) return product;
-            if(product.childCategory.slug == categorySlug) return product;
-            
+            if (product.parentCategory.slug == categorySlug) return product;
+            if (product.subCategory.slug == categorySlug) return product;
+            if (product.childCategory.slug == categorySlug) return product;
+
         })
 
         products = JSON.stringify(products);
@@ -59,14 +92,14 @@ router.get("/product/:category", async (req, res) => {
         if (!lang) return res.json({ result: products });
         products = langReplace(products, lang);
         for (const product of products) {
-            product.brend.discription = langReplace(product.brend.discription, lang);
+            // product.brend.discription = langReplace(product.brend?.discription, lang);
             product.properteis = langReplace(product.properteis, lang);
             product.parentCategory = langReplace(product.parentCategory, lang);
             product.subCategory = langReplace(product.subCategory, lang);
             product.childCategory = langReplace(product.childCategory, lang);
 
         }
-         return res.json( products );
+        return res.json(products);
     } catch (error) {
         console.log(error)
     }
@@ -77,13 +110,16 @@ router.get("/product/:category", async (req, res) => {
 // one product by id 
 router.get("/product-slug/:slug", async (req, res) => {
     try {
+
+        let color = req.query.color || "";
+
+
         let lang = req.headers['lang'];
-        let product = await productModel.findOne({slug: req.params.slug})
+        let product = await productModel.findOne({ slug: req.params.slug })
             .populate("parentCategory")
             .populate("subCategory")
             .populate("childCategory")
-            .populate("shop");
-
+            // .populate("shop");
 
         product = JSON.stringify(product);
         product = JSON.parse(product);
@@ -94,8 +130,7 @@ router.get("/product-slug/:slug", async (req, res) => {
         product.parentCategory = langReplace(product.parentCategory, lang);
         product.subCategory = langReplace(product.subCategory, lang);
         product.childCategory = langReplace(product.childCategory, lang);
-
-        return res.status(200).json( product )
+        return res.status(200).json(product)
     } catch (error) {
         console.log(error);
     }
@@ -116,9 +151,35 @@ router.put("/product/:id", async (req, res) => {
 router.delete("/product/:id", async (req, res) => {
     try {
         const deleted = await productModel.findByIdAndDelete(req.params.id);
-        res.json({ result: deleted });
-    } catch (error) {
+        const {images, colors} = deleted;
 
+        if(colors.length > 0) {
+            for (const color of colors) {
+                for (const image of color.images) {
+                    fs.unlink(
+                        path.join(__dirname, `../uploads/${path.basename(image)}`),
+                        (err) => err && console.log(err)    
+                    )
+                }
+            }
+        }
+
+        if(images.length > 0) {
+            for (const image of images) {
+                fs.unlink(
+                    path.join(__dirname, `../uploads/${path.basename(image)}`),
+                    (err) => err && console.log(err)    
+                )
+            }
+        }
+        
+
+    
+    return res.status(200).json({ result: deleted });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json("Serverda Xatolik")
     }
 });
 

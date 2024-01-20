@@ -13,7 +13,7 @@ router.post("/signup", async (req, res) => {
     try {
         const { phone_number } = req.body;
 
-        const otpCode = generateOTP();
+        const otpCode = generateOTP(4);
         const otp = new otpModel({ phone_number: phone_number, otp: otpCode });
 
         const salt = await bcrypt.genSalt(10);
@@ -36,7 +36,6 @@ router.post("/signup", async (req, res) => {
 router.post("/signup/verify", async (req, res) => {
     try {
         const { phone_number, otp } = req.body;
-
         const otpHoder = await otpModel.find({ phone_number: phone_number });
 
         if (otpHoder.length == 0) return res.status(400).json("You use an Expired OTP!");
@@ -69,11 +68,12 @@ router.post("/signup/verify", async (req, res) => {
 
     } catch (error) {
         console.log(error);
+        return res.status(500).json(error.message)
     }
 })
 
 
-router.get("/user/:id", checkToken, async (req, res) => {
+router.get("/user/:id", checkToken,  async (req, res) => {
     try {
         const user = await userModel.findById(req.params.id);
         if (user) {

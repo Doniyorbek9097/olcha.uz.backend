@@ -14,10 +14,10 @@ router.post("/shop", async(req,res) => {
 });
 
 
-router.get("/shop", async(req,res) => {
+router.get("/shops", async(req,res) => {
     try {
         const shops = await shopModel.find().populate("products").populate("owner")
-        res.json({result:shops});
+        res.status(200).json(shops);
     } catch (error) {
         
     }

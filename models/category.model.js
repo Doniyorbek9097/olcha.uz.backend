@@ -12,45 +12,33 @@ const Schema = mongoose.Schema({
         }
     },
 
-    image: {
-        public_id: String,
-        url: String
-    },
+    image: String,
 
-    top_banner: {
-        uz: [
-            {
-                type: String
-            }
-        ],
-
-        ru: [
-            {
-                type: String
-            }
-        ]
-    },
-
-    left_banner: {
-        uz: {
-            type: String,
-            default: ""
-        },
-
-        ru: {
-            type: String,
-            default: ""
+    left_banner: [
+        {
+            name: {
+                uz: String,
+                ru: String,
+            },
+            path: String
         }
-    },
+    ],
+
+
+    top_banner: [
+        {
+            name: {
+                uz: String,
+                ru: String,
+            },
+            path: String
+        }
+    ],
 
     slug: {
-        type: String,
-        required: true
-    },
-
-    icon: {
         type: String
     },
+
 
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
