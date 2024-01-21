@@ -17,15 +17,15 @@ const {name, image, icon, left_banner, top_banner } = req.body;
 
     if (left_banner && left_banner.length > 0) {
         for (const banner of left_banner) {
-            banner.name.uz = base64Converter(req, banner.image.uz)?.url;
-            banner.name.ru = base64Converter(req, banner.image.ru)?.url;
+            banner.image.uz = base64Converter(req, banner.image.uz)?.url;
+            banner.image.ru = base64Converter(req, banner.image.ru)?.url;
         }
     }
 
     if(top_banner && top_banner.length > 0) {
         for (const banner of top_banner) {
-            banner.name.uz = base64Converter(req, banner.image.uz)?.url;
-            banner.name.ru = base64Converter(req, banner.image.ru)?.url;
+            banner.image.uz = base64Converter(req, banner.image.uz)?.url;
+            banner.image.ru = base64Converter(req, banner.image.ru)?.url;
         }
     }
 
