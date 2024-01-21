@@ -17,15 +17,15 @@ const {name, image, icon, left_banner, top_banner } = req.body;
 
     if (left_banner && left_banner.length > 0) {
         for (const banner of left_banner) {
-            banner.name.uz = base64Converter(req, banner.name.uz)?.url;
-            banner.name.ru = base64Converter(req, banner.name.ru)?.url;
+            banner.name.uz = base64Converter(req, banner.image.uz)?.url;
+            banner.name.ru = base64Converter(req, banner.image.ru)?.url;
         }
     }
 
     if(top_banner && top_banner.length > 0) {
         for (const banner of top_banner) {
-            banner.name.uz = base64Converter(req, banner.name.uz)?.url;
-            banner.name.ru = base64Converter(req, banner.name.ru)?.url;
+            banner.name.uz = base64Converter(req, banner.image.uz)?.url;
+            banner.name.ru = base64Converter(req, banner.image.ru)?.url;
         }
     }
 
@@ -48,8 +48,8 @@ const {name, image, icon, left_banner, top_banner } = req.body;
 
             for (const banner of left_banner) {
                 if (banner) {
-                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
-                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
                     fs.unlink(bannerUzPath, (err) => err && console.log(err));
                     fs.unlink(bannerRuPath, (err) => err && console.log(err));
                 }
@@ -57,8 +57,8 @@ const {name, image, icon, left_banner, top_banner } = req.body;
 
             for (const banner of top_banner) {
                 if (banner) {
-                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
-                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
                     fs.unlink(bannerUzPath, (err) => err && console.log(err));
                     fs.unlink(bannerRuPath, (err) => err && console.log(err));
                 }
@@ -162,8 +162,8 @@ router.delete("/category/:id", async (req, res) => {
 
         if(left_banner?.length) {
             for (const banner of left_banner) {
-                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
-                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
                 fs.unlink(bannerUzPath, (err) => err && console.log(err));
                 fs.unlink(bannerRuPath, (err) => err && console.log(err));
             }
@@ -171,8 +171,8 @@ router.delete("/category/:id", async (req, res) => {
         
         if(top_banner?.length) {
             for (const banner of top_banner) {
-                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.name.uz)}`);
-                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.name.ru)}`);
+                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
                 fs.unlink(bannerUzPath, (err) => err && console.log(err));
                 fs.unlink(bannerRuPath, (err) => err && console.log(err));
             }
