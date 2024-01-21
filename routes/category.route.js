@@ -151,6 +151,7 @@ router.delete("/category/:id", async (req, res) => {
     try {
 
         const deleted = await categoryModel.findByIdAndDelete(req.params.id);
+        if(!deleted) return res.status(404).json("Category not found");
 
         let { image, left_banner, top_banner } = deleted;
 

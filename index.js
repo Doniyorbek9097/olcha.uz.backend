@@ -9,11 +9,7 @@ const i18n = require("./locales");
 const path = require("path")
 const { textConverter } = require("./utils/textConverter")
 
-app.use(cors({
-    origin: 'https://olchaclone.netlify.app', // Client saytingizning domeni
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  }));
+app.use(cors());
   
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));

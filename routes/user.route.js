@@ -12,6 +12,7 @@ const { generateOTP } = require("../utils/otpGenrater");
 router.post("/signup", async (req, res) => {
     try {
         const { phone_number } = req.body;
+         if(!phone_number) return res.status(404).send("Telefon raqam topilmadi");
 
         const otpCode = generateOTP(4);
         const otp = new otpModel({ phone_number: phone_number, otp: otpCode });
