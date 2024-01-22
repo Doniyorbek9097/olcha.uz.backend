@@ -29,11 +29,17 @@ const cartSchema = mongooose.Schema({
             quantity: {
                 type:Number,
                 required:true
-            }
-
+            },
             
         }
     ],
-});
+
+    createdAt: { 
+        type: Date, 
+        default: Date.now, 
+        expires:3600 
+    }
+
+},{timestamps:true});
 
 module.exports = mongooose.model("Cart", cartSchema);
