@@ -30,8 +30,13 @@ const {name, image, icon, left_banner, top_banner } = req.body;
     }
 
     try {
-        const newCategory = await categoryModel(req.body).save();
-        res.json(newCategory)
+        if(req.body._id) {
+            const category = await categoryModel.findByIdAndUpdate(req.body._id, req.body);
+            return res.status(200).json(category);
+        }
+
+       const newCategory = await categoryModel(req.body).save();
+       return res.status(200).json(newCategory);
 
     } catch (error) {
         if (error) {
@@ -120,7 +125,7 @@ router.get("/category/:id", async (req, res) => {
         const category = await categoryModel.findById(req.params.id);
         if(!category) return res.status(404).send("Category topilmadi");
         return res.status(200).json(category);
-        
+
     } catch (error) {
         console.log(error)
         res.status(500).send(error.message)
