@@ -30,13 +30,8 @@ const {name, image, icon, left_banner, top_banner } = req.body;
     }
 
     try {
-        if(req.body._id) {
-            const category = await categoryModel.findByIdAndUpdate(req.body._id, req.body);
-            return res.status(200).json(category);
-        }
-
-       const newCategory = await categoryModel(req.body).save();
-       return res.status(200).json(newCategory);
+        const newCategory = await categoryModel(req.body).save();
+        return res.status(201).json(newCategory)
 
     } catch (error) {
         if (error) {
@@ -125,7 +120,6 @@ router.get("/category/:id", async (req, res) => {
         const category = await categoryModel.findById(req.params.id);
         if(!category) return res.status(404).send("Category topilmadi");
         return res.status(200).json(category);
-
     } catch (error) {
         console.log(error)
         res.status(500).send(error.message)
@@ -141,13 +135,14 @@ router.get("/category/:slug", async (req, res) => {
     try {
         const lang = req.headers["lang"];
         let category = await categoryModel.findOne({ slug: req.params.slug });
-        if (!lang) return res.json({ result: category });
+        if(!category) return res.status(404).send("Category topilmadi")
+        if (!lang) return res.status(200).json({ result: category });
         category = JSON.stringify(category);
         category = JSON.parse(category);
         category = langReplace(category, lang);
         category.products = langReplace(category.products, lang);
 
-        return res.json(category);
+        return res.status(200).json(category);
     } catch (error) {
         if (error) {
             console.log(error);
@@ -160,10 +155,16 @@ router.get("/category/:slug", async (req, res) => {
 router.put("/category/:id", async (req, res) => {
     try {
         req.body.slug = slugify(req.body.name.uz);
-        const upadted = await categoryModel.findByIdAndUpdate(req.params.id, req.body);
-        res.json({ result: upadted });
+        const upadted = await categoryModel.findByIdAndUpdate(req.params.id, {
+            parentId: req.body.parentId,
+            name: req.body.name,
+            slug: req.body.slug
+        });
+        return res.status(200).json(upadted);
+
     } catch (error) {
         console.log(error);
+        res.status(500).send(error.message)
     }
 });
 
@@ -206,7 +207,7 @@ router.delete("/category/:id", async (req, res) => {
     }
     
 
-        res.json({ result: parentDeleted });
+    res.status(200).json(parentDeleted);
 
     } catch (error) {
         console.log(error);
