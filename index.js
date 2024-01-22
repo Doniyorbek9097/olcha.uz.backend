@@ -7,8 +7,8 @@ const routes = require("./routes");
 const app = express();
 const i18n = require("./locales");
 const path = require("path")
-const { textConverter } = require("./utils/textConverter")
-
+const { base64Converter } = require("./utils/base64Converter")
+base64Converter()
 app.use(cors());
   
 app.use(bodyParser.json({limit: '100mb'}));

@@ -149,20 +149,22 @@ router.put("/category/:id", async (req, res) => {
 // Delete Category 
 router.delete("/category/:id", async (req, res) => {
     try {
+        const allCategoies = [];
+        const parentDeleted = await categoryModel.findByIdAndDelete(req.params.id);
+        if(!parentDeleted) return res.status(404).json("Category not found");
+        const subDeleted = parentDeleted && await categoryModel.findOneAndDelete({parentId: parentDeleted._id});
+        const childDeleted = subDeleted && await categoryModel.findOneAndDelete({parentId: subDeleted._id});
+        allCategoies.push(parentDeleted, subDeleted, childDeleted);
 
-        const deleted = await categoryModel.findByIdAndDelete(req.params.id);
-        if(!deleted) return res.status(404).json("Category not found");
-
-        let { image, left_banner, top_banner } = deleted;
-
-        if (image) {
-            const imagePath = path.join(__dirname, `../uploads/${path.basename(image)}`);
+        for (const cate of allCategoies) {
+            if (cate && cate.image) {
+            const imagePath = path.join(__dirname, `../uploads/${path.basename(cate.image)}`);
             fs.unlink(imagePath, (err) => err && console.log(err));
         }
         
 
-        if(left_banner?.length) {
-            for (const banner of left_banner) {
+        if(cate && cate.cateleft_banner?.length) {
+            for (const banner of cate.left_banner) {
                 const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
                 const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
                 fs.unlink(bannerUzPath, (err) => err && console.log(err));
@@ -170,8 +172,8 @@ router.delete("/category/:id", async (req, res) => {
             }
         }
         
-        if(top_banner?.length) {
-            for (const banner of top_banner) {
+        if(cate && cate.top_banner?.length) {
+            for (const banner of cate.top_banner) {
                 const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
                 const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
                 fs.unlink(bannerUzPath, (err) => err && console.log(err));
@@ -179,9 +181,10 @@ router.delete("/category/:id", async (req, res) => {
             }
         }
         
+    }
+    
 
-
-        res.json({ result: deleted });
+        res.json({ result: parentDeleted });
 
     } catch (error) {
         console.log(error);
