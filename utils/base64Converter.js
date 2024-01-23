@@ -3,7 +3,7 @@ const path = require("path");
 const { generateOTP } = require('./otpGenrater');
 const resizeImage = require("./resizeImage");
 
-exports.base64Converter = function (req, base64) {
+exports.base64Converter = function (req, base64, w=500, h=500) {
     const uploadFolder = path.join(__dirname, "../uploads");
 
     if(Array.isArray(base64) && base64 !== null) {
@@ -15,7 +15,7 @@ exports.base64Converter = function (req, base64) {
             const filePath = path.join(__dirname, "../uploads", filename)
             const matches = file.toString().match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
             fs.writeFileSync(filePath, Buffer.from(matches[2], 'base64'));
-            filePaths.push(resizeImage(req, filePath));
+            filePaths.push(resizeImage(req, filePath, w, h));
         }
 
         return  filePaths;
@@ -28,7 +28,7 @@ exports.base64Converter = function (req, base64) {
     const base64Image = base64.substring(base64Index)
     if(base64Index !== 7)
     fs.writeFileSync(filePath, Buffer.from(base64Image, 'base64'))
-    return  resizeImage(req, filePath);   
+    return  resizeImage(req, filePath, w, h);   
 
 
 }

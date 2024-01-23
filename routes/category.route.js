@@ -13,19 +13,19 @@ router.post("/category", async (req, res) => {
 const {name, image, icon, left_banner, top_banner } = req.body;
 
     req.body.slug = slugify(name.uz);
-    image && (req.body.image = base64Converter(req, image));
+    image && (req.body.image = base64Converter(req, image, 200, 200));
 
     if (left_banner && left_banner.length > 0) {
         for (const banner of left_banner) {
-            banner.image.uz = base64Converter(req, banner.image.uz);
-            banner.image.ru = base64Converter(req, banner.image.ru);
+            banner.image.uz = base64Converter(req, banner.image.uz, 200, 500);
+            banner.image.ru = base64Converter(req, banner.image.ru, 200, 500);
         }
     }
 
     if(top_banner && top_banner.length > 0) {
         for (const banner of top_banner) {
-            banner.image.uz = base64Converter(req, banner.image.uz);
-            banner.image.ru = base64Converter(req, banner.image.ru);
+            banner.image.uz = base64Converter(req, banner.image.uz, 500, 400);
+            banner.image.ru = base64Converter(req, banner.image.ru, 500, 400);
         }
     }
 
