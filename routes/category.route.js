@@ -24,8 +24,8 @@ const {name, image, icon, left_banner, top_banner } = req.body;
 
     if(top_banner && top_banner.length > 0) {
         for (const banner of top_banner) {
-            banner.image.uz = base64Converter(req, banner.image.uz, 500, 400);
-            banner.image.ru = base64Converter(req, banner.image.ru, 500, 400);
+            banner.image.uz = base64Converter(req, banner.image.uz, 300, 200);
+            banner.image.ru = base64Converter(req, banner.image.ru, 300, 200);
         }
     }
 
