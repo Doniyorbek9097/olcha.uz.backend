@@ -12,10 +12,10 @@ const { base64Converter } = require("../utils/base64Converter");
 // create new Product 
 router.post("/product", async (req, res) => {
     req.body.slug = slugify(req.body.name.uz);
-    req.body.images = base64Converter(req, req.body.images).url;
+    req.body.images = base64Converter(req, req.body.images);
 
     for (const color of req.body.colors) {
-            color.images = base64Converter(req, color.images).url;
+            color.images = base64Converter(req, color.images);
         }
         
     try {

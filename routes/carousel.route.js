@@ -11,8 +11,8 @@ const router = require("express").Router();
 router.post("/carousel", async(req, res)=> {
     const { image, slug } = req.body;
     req.body.slug = slugify(slug);
-    image && (req.body.image.uz = base64Converter(req, image.uz)?.url);
-    image && (req.body.image.ru = base64Converter(req, image.ru)?.url);
+    image && (req.body.image.uz = base64Converter(req, image.uz));
+    image && (req.body.image.ru = base64Converter(req, image.ru));
 
     try {        
         const result = await new carouselModel(req.body).save();

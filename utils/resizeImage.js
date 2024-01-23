@@ -4,49 +4,58 @@ const url = require("url");
 const sharp = require("sharp");
 const { generateOTP } = require("./otpGenrater");
 
-module.exports = resizeImage = (filePath) => {
-    if(Array.isArray(filePath) && filePath !== null) {
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+const inputFilePath = './image.jpg';
+// Saqlash uchun fayl nomini o'zgartiring
+const outputFilePath = 'output.webp';
+const targetWidth = 500; // O'zgartirilgan o'lcham
+const targetHeight = 700; // O'zgartirilgan o'lcham
+
+
+module.exports = resizeImage = (req, filePath, w=500, h=700) => {
+    if(!fs.existsSync(filePath)) return;
+    if (Array.isArray(filePath) && filePath !== null) {
         const files = [];
         for (const filepath of filePath) {
-                const fileName = `image-${generateOTP(7)}.webp`;
-                const newFilePath = path.join(path.dirname(filepath), fileName);
-                sharp(filepath)
-                    .resize({ fit: "outside", width: 500, height: 800 })
-                    .webp()
-                    .toFile(newFilePath, async (err, info) => {
-                        if (err) {
-                            return console.log(err)
-                        } else {
-                            fs.unlink(filepath, (err) => {
-                                if(err) console.log(err);
-                            })
-                        }
-        
-                       
+            const fileName = `image-${generateOTP(7)}.webp`;
+            const newFilePath = path.join(path.dirname(filepath), fileName);
+
+            ffmpeg()
+                .input(filepath)
+                .outputOptions([`-vf scale=${w}:${h}`])
+                .toFormat('webp')
+                .on('end', () => {
+                    console.log('Tayyor!')
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.log(err);
                     })
+                })
+                .save(newFilePath)
 
-                    files.push(`http://localhost:5000/uploads/${fileName}`)
-                 }
 
-                 return files
+            files.push(`${req.protocol}://${req.headers.host}/uploads/${fileName}`)
+        }
+
+        return files
     }
 
-        const fileName = `image-${generateOTP(7)}.png`;
+    const fileName = `image-${generateOTP(7)}.webp`;
 
-        const newFilePath = path.join(path.dirname(filePath), fileName);
-        sharp(filePath)
-            .resize({ fit: "outside", width: 500, height: 800 })
-            .png()
-            .toFile(newFilePath, async (err, info) => {
-                if (err) {
-                    return console.log(err)
-                } else {
-                    fs.unlink(filePath, (err) => {
-                        if(err) console.log(err);
-                    })
-                } 
-                
-            })
+    const newFilePath = path.join(path.dirname(filePath), fileName);
+    ffmpeg()
+    .input(filePath)
+    .outputOptions([`-vf scale=${w}:${h}`])
+    .toFormat('webp')
+    .on('end', () => {
+        console.log('Tayyor!')
+        fs.unlink(filePath, (err) => {
+            if (err) console.log(err);
+        })
+    })
+    .save(newFilePath)
 
-            return `http://localhost:5000/uploads/${fileName}`;
+    return `${req.protocol}://${req.headers.host}/uploads/${fileName}`;
 }
