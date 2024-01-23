@@ -25,7 +25,7 @@ module.exports = resizeImage = (req, filePath, w=500, h=700) => {
 
             ffmpeg()
                 .input(filepath)
-                .outputOptions([`-vf crop=${w}:${h}`])
+                .outputOptions([`-vf scale=${w}:${h}`])
                 .toFormat('webp')
                 .on('end', () => {
                     console.log('Tayyor!')
@@ -47,7 +47,7 @@ module.exports = resizeImage = (req, filePath, w=500, h=700) => {
     const newFilePath = path.join(path.dirname(filePath), fileName);
     ffmpeg()
     .input(filePath)
-    .outputOptions([`-vf crop=${w}:${h}`])
+    .outputOptions([`-vf scale=${w}:${h}`])
     .toFormat('webp')
     .on('end', () => {
         console.log('Tayyor!')
