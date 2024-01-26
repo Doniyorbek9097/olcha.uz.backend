@@ -16,7 +16,7 @@ module.exports = resizeImage = (req, filePath, w=500, h=700) => {
 
             ffmpeg()
                 .input(filepath)
-                .outputOptions([`-vf scale=${w}:${h}`])
+                .outputOptions([`-vf crop=${w}:${h}`])
                 .toFormat('webp')
                 .on('end', () => {
                     fs.unlink(filePath, (err) => {
@@ -37,7 +37,7 @@ module.exports = resizeImage = (req, filePath, w=500, h=700) => {
     const newFilePath = path.join(path.dirname(filePath), fileName);
     ffmpeg()
     .input(filePath)
-    .outputOptions([`-vf scale=${w}:${h}`])
+    .outputOptions([`-vf crop=${w}:${h}`])
     .toFormat('webp')
     .on('end', () => {
         fs.unlink(filePath, (err) => {
