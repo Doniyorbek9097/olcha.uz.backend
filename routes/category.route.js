@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const slugify = require("slugify");
+const mongoose = require("mongoose");
 const categoryModel = require("../models/category.model");
 const langReplace = require("../utils/langReplace");
 const nestedCategories = require("../utils/nestedCategories");
@@ -10,7 +11,8 @@ const fs = require("fs");
 
 // Create new Category 
 router.post("/category", async (req, res) => {
-const {name, image, icon, left_banner, top_banner } = req.body;
+const {name, image, left_banner, top_banner } = req.body;
+
     req.body.slug = slugify(name.uz);
     image && (req.body.image = base64Converter(req, image, 200, 200));
 
@@ -18,6 +20,7 @@ const {name, image, icon, left_banner, top_banner } = req.body;
         for (const banner of left_banner) {
             banner.image.uz = base64Converter(req, banner.image.uz, 200, 500);
             banner.image.ru = base64Converter(req, banner.image.ru, 200, 500);
+            banner.slug = slugify(banner.slug);
         }
     }
 
@@ -25,6 +28,7 @@ const {name, image, icon, left_banner, top_banner } = req.body;
         for (const banner of top_banner) {
             banner.image.uz = base64Converter(req, banner.image.uz, 300, 200);
             banner.image.ru = base64Converter(req, banner.image.ru, 300, 200);
+            banner.slug = slugify(banner.slug);
         }
     }
 
@@ -40,10 +44,6 @@ const {name, image, icon, left_banner, top_banner } = req.body;
                 fs.unlink(imagePath, (err) => err && console.log(err));
             }
 
-            if (icon) {
-                const iconPath = path.join(__dirname, `../uploads/${path.basename(icon)}`);
-                fs.unlink(iconPath, (err) => err && console.log(err));
-            }
 
             for (const banner of left_banner) {
                 if (banner) {
@@ -116,6 +116,9 @@ router.get("/category", async (req, res) => {
 // Get byId Category 
 router.get("/category/:id", async (req, res) => {
     try {
+        if(!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(404).send("Category Id haqiqiy emas");
+        }
         const category = await categoryModel.findById(req.params.id);
         if(!category) return res.status(404).send("Category topilmadi");
         return res.status(200).json(category);
