@@ -2,20 +2,17 @@ const router = require("express").Router();
 const productModel = require("../models/product.model");
 const slugify = require("slugify");
 const langReplace = require("../utils/langReplace");
-const { upload } = require("../middlewares/upload");
-const { uploader } = require("../middlewares/uploader");
-const resizeImage = require("../utils/resizeImage")
 const path = require("path")
 const fs = require("fs");
-const { base64Converter } = require("../utils/base64Converter");
+const { Base64ToFile } = require("../utils/base64ToFile");
 
 // create new Product 
 router.post("/product", async (req, res) => {
     req.body.slug = slugify(req.body.name.uz);
-    req.body.images = base64Converter(req, req.body.images);
+    req.body.images = await new Base64ToFile(req).bufferInput(req.body.images).save();
 
     for (const color of req.body.colors) {
-            color.images = base64Converter(req, color.images);
+            color.images =  await new Base64ToFile(req).bufferInput(color.images).save();
         }
         
     try {

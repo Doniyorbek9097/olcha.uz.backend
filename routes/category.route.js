@@ -4,68 +4,24 @@ const mongoose = require("mongoose");
 const categoryModel = require("../models/category.model");
 const langReplace = require("../utils/langReplace");
 const nestedCategories = require("../utils/nestedCategories");
-const { base64Converter } = require("../utils/base64Converter");
-const resizeImage = require("../utils/resizeImage");
+const { Base64ToFile } = require("../utils/base64ToFile");
+const { isEqual } = require("../utils/isEqual");
 const path = require("path");
 const fs = require("fs");
 
 // Create new Category 
 router.post("/category", async (req, res) => {
-const {name, image, left_banner, top_banner } = req.body;
-
-    req.body.slug = slugify(name.uz);
-    image && (req.body.image = base64Converter(req, image, 128, 128));
-
-    if (left_banner && left_banner.length > 0) {
-        for (const banner of left_banner) {
-            banner.image.uz = base64Converter(req, banner.image.uz, 822, 2772);
-            banner.image.ru = base64Converter(req, banner.image.ru, 822, 2772);
-            banner.slug = slugify(banner.slug);
-        }
-    }
-
-    if(top_banner && top_banner.length > 0) {
-        for (const banner of top_banner) {
-            banner.image.uz = base64Converter(req, banner.image.uz, 2133, 750);
-            banner.image.ru = base64Converter(req, banner.image.ru, 2133, 750);
-            banner.slug = slugify(banner.slug);
-        }
-    }
-
     try {
-        const newCategory = await categoryModel(req.body).save();
+        if (!req.body.name || (!req.body.name.uz && !req.body.name.ru))
+            return res.status(404).send("category name not found");
+        const newCategory = await categoryModel({
+            name: req.body.name
+
+        }).save();
         return res.status(201).json(newCategory)
 
     } catch (error) {
-        if (error) {
-
-            if (image) {
-                const imagePath = path.join(__dirname, `../uploads/${path.basename(image)}`);
-                fs.unlink(imagePath, (err) => err && console.log(err));
-            }
-
-
-            for (const banner of left_banner) {
-                if (banner) {
-                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
-                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
-                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
-                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
-                }
-            }
-
-            for (const banner of top_banner) {
-                if (banner) {
-                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
-                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
-                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
-                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
-                }
-            }
-
-
-            return res.status(500).json("server ishlamayapti")
-        }
+        return res.status(500).json("server ishlamayapti")
     }
 });
 
@@ -116,11 +72,11 @@ router.get("/category", async (req, res) => {
 // Get byId Category 
 router.get("/category/:id", async (req, res) => {
     try {
-        if(!mongoose.isValidObjectId(req.params.id)) {
+        if (!mongoose.isValidObjectId(req.params.id)) {
             return res.status(404).send("Category Id haqiqiy emas");
         }
         const category = await categoryModel.findById(req.params.id);
-        if(!category) return res.status(404).send("Category topilmadi");
+        if (!category) return res.status(404).send("Category topilmadi");
         return res.status(200).json(category);
     } catch (error) {
         console.log(error)
@@ -137,7 +93,7 @@ router.get("/category/:slug", async (req, res) => {
     try {
         const lang = req.headers["lang"];
         let category = await categoryModel.findOne({ slug: req.params.slug });
-        if(!category) return res.status(404).send("Category topilmadi")
+        if (!category) return res.status(404).send("Category topilmadi")
         if (!lang) return res.status(200).json({ result: category });
         category = JSON.stringify(category);
         category = JSON.parse(category);
@@ -155,18 +111,66 @@ router.get("/category/:slug", async (req, res) => {
 
 // Edit Category 
 router.put("/category/:id", async (req, res) => {
+    const { image, left_banner, top_banner } = req.body;
+    const category = await categoryModel.findById(req.params.id);
+
+    req.body.image = await new Base64ToFile(req).bufferInput(image).fileName(category.image).save();
+    // left banner updated 
+    const findLeft = await category?.left_banner.find(banner => banner);
+
+    for (const banner of left_banner) {
+        banner.image.uz = await new Base64ToFile(req).bufferInput(banner?.image.uz).fileName(findLeft?.image.uz).save();
+        banner.image.ru = await new Base64ToFile(req).bufferInput(banner?.image.ru).fileName(findLeft?.image.ru).save();
+        banner.slug = banner.slug;
+    }
+
+    // left banner updated end
+
+    // top banner updated
+    const findTop = await category?.top_banner;
+
+    for (const i in top_banner) {
+        top_banner[i].image.uz = await new Base64ToFile(req).bufferInput(top_banner[i].image.uz).fileName(findTop[i]?.image.uz).save();
+        top_banner[i].image.ru = await new Base64ToFile(req).bufferInput(top_banner[i].image.ru).fileName(findTop[i]?.image.ru).save();
+        top_banner[i].slug = slugify(top_banner[i].slug);
+    }
+
+    // top banner updated end
+
+
     try {
-        req.body.slug = slugify(req.body.name.uz);
-        const upadted = await categoryModel.findByIdAndUpdate(req.params.id, {
-            parentId: req.body.parentId,
-            name: req.body.name,
-            slug: req.body.slug
-        });
+        const upadted = await categoryModel.findByIdAndUpdate(req.params.id, req.body);
         return res.status(200).json(upadted);
 
     } catch (error) {
-        console.log(error);
-        res.status(500).send(error.message)
+        if (error) {
+            if (image) {
+                const imagePath = path.join(__dirname, `../uploads/${path.basename(image)}`);
+                fs.unlink(imagePath, (err) => err && console.log(err));
+            }
+
+
+            for (const banner of left_banner) {
+                if (banner) {
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
+                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
+                }
+            }
+
+            for (const banner of top_banner) {
+                if (banner) {
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
+                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
+                }
+            }
+
+
+            return res.status(500).json("server ishlamayapti")
+        }
     }
 });
 
@@ -176,40 +180,40 @@ router.delete("/category/:id", async (req, res) => {
     try {
         const allCategoies = [];
         const parentDeleted = await categoryModel.findByIdAndDelete(req.params.id);
-        if(!parentDeleted) return res.status(404).json("Category not found");
-        const subDeleted = parentDeleted && await categoryModel.findOneAndDelete({parentId: parentDeleted._id});
-        const childDeleted = subDeleted && await categoryModel.findOneAndDelete({parentId: subDeleted._id});
+        if (!parentDeleted) return res.status(404).json("Category not found");
+        const subDeleted = parentDeleted && await categoryModel.findOneAndDelete({ parentId: parentDeleted._id });
+        const childDeleted = subDeleted && await categoryModel.findOneAndDelete({ parentId: subDeleted._id });
         allCategoies.push(parentDeleted, subDeleted, childDeleted);
 
         for (const cate of allCategoies) {
             if (cate && cate.image) {
-            const imagePath = path.join(__dirname, `../uploads/${path.basename(cate.image)}`);
-            fs.unlink(imagePath, (err) => err && console.log(err));
-        }
-        
-
-        if(cate && cate.cateleft_banner?.length) {
-            for (const banner of cate.left_banner) {
-                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
-                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
-                fs.unlink(bannerUzPath, (err) => err && console.log(err));
-                fs.unlink(bannerRuPath, (err) => err && console.log(err));
+                const imagePath = path.join(__dirname, `../uploads/${path.basename(cate.image)}`);
+                fs.unlink(imagePath, (err) => err && console.log(err));
             }
-        }
-        
-        if(cate && cate.top_banner?.length) {
-            for (const banner of cate.top_banner) {
-                const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
-                const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
-                fs.unlink(bannerUzPath, (err) => err && console.log(err));
-                fs.unlink(bannerRuPath, (err) => err && console.log(err));
-            }
-        }
-        
-    }
-    
 
-    res.status(200).json(parentDeleted);
+
+            if (cate && cate.left_banner?.length) {
+                for (const banner of cate.left_banner) {
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
+                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
+                }
+            }
+
+            if (cate && cate.top_banner?.length) {
+                for (const banner of cate.top_banner) {
+                    const bannerUzPath = path.join(__dirname, `../uploads/${path.basename(banner.image.uz)}`);
+                    const bannerRuPath = path.join(__dirname, `../uploads/${path.basename(banner.image.ru)}`);
+                    fs.unlink(bannerUzPath, (err) => err && console.log(err));
+                    fs.unlink(bannerRuPath, (err) => err && console.log(err));
+                }
+            }
+
+        }
+
+
+        res.status(200).json(parentDeleted);
 
     } catch (error) {
         console.log(error);

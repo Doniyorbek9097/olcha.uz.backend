@@ -6,8 +6,10 @@ require("./config/db");
 const routes = require("./routes");
 const app = express();
 const i18n = require("./locales");
-const path = require("path")
-const  resizeImage  = require("./utils/resizeImage")
+const path = require("path");
+const { isEqual } = require("./utils/isEqual");
+
+
 app.use(cors());
 
 // const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
@@ -24,6 +26,10 @@ app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use("/uploads", express.static("uploads"))
 routes.forEach(route => app.use("/", route));
 
+// const a = {a:"sardor"}
+// const b = {a: "sardor", s:"ss"};
+
+// console.log(isEqual(a, b));
 
 
 

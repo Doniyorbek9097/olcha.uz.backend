@@ -1,18 +1,17 @@
 const carouselModel = require("../models/carousel.model");
 const slugify = require("slugify");
-const { base64Converter } = require("../utils/base64Converter");
 const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
 const langReplace = require("../utils/langReplace");
-
+const { Base64ToFile } = require("../utils/base64ToFile");
 const router = require("express").Router();
 
 router.post("/carousel", async(req, res)=> {
     const { image, slug } = req.body;
     req.body.slug = slugify(slug);
-    image && (req.body.image.uz = base64Converter(req, image.uz));
-    image && (req.body.image.ru = base64Converter(req, image.ru));
+    image && (req.body.image.uz = await new Base64ToFile(req).bufferInput(req.body.image.uz).save());
+    image && (req.body.image.ru = await new Base64ToFile(req).bufferInput(req.body.image.ru).save());
 
     try {        
         const result = await new carouselModel(req.body).save();

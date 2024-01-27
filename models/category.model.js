@@ -20,7 +20,7 @@ const Schema = mongoose.Schema({
                 uz: String,
                 ru: String,
             },
-            path: String
+            slug: String
         }
     ],
 
@@ -31,7 +31,8 @@ const Schema = mongoose.Schema({
                 uz: String,
                 ru: String,
             },
-            path: String
+
+            slug: String
         }
     ],
 

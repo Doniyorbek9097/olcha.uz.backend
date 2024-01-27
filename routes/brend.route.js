@@ -2,7 +2,7 @@ const slugify = require("slugify");
 const brendModel = require("../models/brend.model");
 const router = require("express").Router();
 const { langReplace } = require("../utils/langReplace") 
-const { base64Converter } = require("../utils/base64Converter") 
+// const { base64Converter } = require("../utils/base64Converter") 
 
 
 router.get("/brends/:slug", async (req, res) => {
@@ -22,8 +22,8 @@ router.get("/brends/:slug", async (req, res) => {
 
 router.post("/add-brend", async(req, res) => {
     try {
-        req.body.image = base64Converter(req.body.image);
-        req.body.logo = base64Converter(req.body.logo);
+        // req.body.image = base64Converter(req.body.image);
+        // req.body.logo = base64Converter(req.body.logo);
         req.body.slug = slugify(req.body.name);
 
         const newBrend = await new brendModel(req.body).save();
