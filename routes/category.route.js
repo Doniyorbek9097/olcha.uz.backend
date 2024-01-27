@@ -13,11 +13,10 @@ const fs = require("fs");
 router.post("/category", async (req, res) => {
     try {
         if (!req.body.name || (!req.body.name.uz && !req.body.name.ru))
-            return res.status(404).send("category name not found");
-        const newCategory = await categoryModel({
-            name: req.body.name
-
-        }).save();
+        return res.status(404).send("category name not found");
+    
+        req.body.slug = slugify(req.body.name.uz)
+        const newCategory = await categoryModel(req.body).save();
         return res.status(201).json(newCategory)
 
     } catch (error) {
