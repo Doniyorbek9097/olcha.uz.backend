@@ -31,7 +31,7 @@ router.post("/product", async (req, res) => {
         if(error) {
             console.log(error)
             const { colors, images } = req.body;
-            if(colors.length > 0) {
+            if(colors?.length > 0) {
                 for (const color of colors) {
                     for (const image of color.images) {
                         fs.unlink(
@@ -42,7 +42,7 @@ router.post("/product", async (req, res) => {
                 }
             }
 
-            if(images.length > 0) {
+            if(images?.length > 0) {
                 for (const image of images) {
                     fs.unlink(
                         path.join(__dirname, `../uploads/${path.basename(image)}`),
