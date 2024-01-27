@@ -31,12 +31,12 @@ const Schema = mongoose.Schema({
     properteis: [
         {
             uz: {
-                type: String,
-                default: ""
+                key: String,
+                value: String
             },
             ru: {
-                type: String,
-                default: ""
+                key: String,
+                value: String
             }
         }
     ],
