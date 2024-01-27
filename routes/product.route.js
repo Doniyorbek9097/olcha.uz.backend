@@ -18,9 +18,9 @@ router.post("/product", async (req, res) => {
     }
 
 
-    for (const color of req.body.colors) {
-            color.images =  await new Base64ToFile(req).bufferInput(color.images).save();
-        }
+    // for (const color of req.body.colors) {
+    //         color.images =  await new Base64ToFile(req).bufferInput(color.images).save();
+    //     }
         
     try {
         
