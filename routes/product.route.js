@@ -8,14 +8,15 @@ const { Base64ToFile } = require("../utils/base64ToFile");
 
 // create new Product 
 router.post("/product", async (req, res) => {
+    const { images } = req.body; 
     req.body.slug = slugify(req.body.name.uz);
-    const images = [];
-    for (const image of req.body.images) {
+    req.body.images = [];
+
+    for (const image of images) {
         const data = await new Base64ToFile(req).bufferInput(image).save();
-        images.push(data)
+        req.body.images.push(data);
     }
 
-    req.body.images = images;
 
     for (const color of req.body.colors) {
             color.images =  await new Base64ToFile(req).bufferInput(color.images).save();
