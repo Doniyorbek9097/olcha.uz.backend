@@ -28,19 +28,17 @@ router.post("/product", async (req, res) => {
         return res.status(200).json(newProduct);
 
     } catch (error) {
-        if(error) {
-            console.log(error)
-            const { colors, images } = req.body;
-            if(colors?.length > 0) {
-                for (const color of colors) {
-                    for (const image of color.images) {
-                        fs.unlink(
-                            path.join(__dirname, `../uploads/${path.basename(image)}`),
-                            (err) => err && console.log(err)    
-                        )
-                    }
-                }
-            }
+            const { images } = req.body;
+            // if(colors?.length > 0) {
+            //     for (const color of colors) {
+            //         for (const image of color.images) {
+            //             fs.unlink(
+            //                 path.join(__dirname, `../uploads/${path.basename(image)}`),
+            //                 (err) => err && console.log(err)    
+            //             )
+            //         }
+            //     }
+            // }
 
             if(images?.length > 0) {
                 for (const image of images) {
@@ -53,7 +51,6 @@ router.post("/product", async (req, res) => {
             
             return res.status(500).json("serverda Xatolik")
         }
-    }
 });
 
 // get all products 
