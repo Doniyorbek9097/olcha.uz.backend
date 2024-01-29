@@ -12,7 +12,7 @@ class Base64ToFile {
     constructor(request, response) {
         this.request = request;
         this.response = response;
-        this._file_name = `image-${generateOTP(10)}.jpg`;
+        this._file_name = `image-${generateOTP(10)}.webp`;
         this._file_path = path.join(__dirname, "../uploads");
         this._bufferInput = "";
         this._width = "";
@@ -68,7 +68,8 @@ class Base64ToFile {
         resolve(this._bufferInput);
 
         const filePath = path.join(this._file_path, this._file_name);
-        const outputPath = path.join(this._file_path, `image-${generateOTP(10)}.webp`);
+        const newFileName = `image-${generateOTP(10)}.webp`;
+        const outputPath = path.join(this._file_path, newFileName);
 
         const base64Index = this._bufferInput.indexOf(';base64,') + ';base64,'.length;
         const base64Image = this._bufferInput.substring(base64Index)
@@ -79,12 +80,16 @@ class Base64ToFile {
         (err) => {
             if(err) throw rejact(err);
             sharp(filePath)
-            .resize({ width: 800 }) // O'lchamni o'zgartiramiz (masalan, 800 piksel)
-            .toFormat('webp') // WebP formatga o'tkazamiz
+            .resize({ width: 800 })
+            .toFormat('webp') 
             .toFile(outputPath, (err, info) => {
               if (err) throw err;
+              if(fs.existsSync(filePath)) 
                 fs.unlinkSync(filePath);
-                resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${this._file_name}`)
+            else {
+                console.log('ishlamadi');
+            }
+                resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${newFileName}`)
             });
         }
 
