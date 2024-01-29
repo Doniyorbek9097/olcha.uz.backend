@@ -26,10 +26,6 @@ app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use("/uploads", express.static("uploads"))
 routes.forEach(route => app.use("/", route));
 
-// const a = {a:"sardor"}
-// const b = {a: "sardor", s:"ss"};
-
-// console.log(isEqual(a, b));
 
 
 

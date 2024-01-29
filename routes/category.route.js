@@ -36,7 +36,9 @@ router.get("/category", async (req, res) => {
         let limit = parseInt(req.query.limit) || 10;
         let search = req.query.search || "";
 
-        let categories = await categoryModel.find().populate("products")
+        let categories = await categoryModel.find()
+        .populate("products", "name slug price images")
+
         let categoryList = nestedCategories(categories);
         categoryList = JSON.stringify(categoryList);
         categoryList = JSON.parse(categoryList);

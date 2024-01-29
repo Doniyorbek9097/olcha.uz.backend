@@ -1,6 +1,7 @@
 const path = require("path")
 const fs = require("fs")
 const { generateOTP } = require("./otpGenrater");
+const sharp = require("sharp");
 
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
@@ -11,7 +12,7 @@ class Base64ToFile {
     constructor(request, response) {
         this.request = request;
         this.response = response;
-        this._file_name = `image-${generateOTP(10)}.webp`;
+        this._file_name = `image-${generateOTP(10)}.jpg`;
         this._file_path = path.join(__dirname, "../uploads");
         this._bufferInput = "";
         this._width = "";
@@ -65,14 +66,29 @@ class Base64ToFile {
 
         if(typeof this._bufferInput !== 'string' || this._bufferInput.includes("base64") == false)
         resolve(this._bufferInput);
+
+        const filePath = path.join(this._file_path, this._file_name);
+        const outputPath = path.join(this._file_path, `image-${generateOTP(10)}.webp`);
+
         const base64Index = this._bufferInput.indexOf(';base64,') + ';base64,'.length;
         const base64Image = this._bufferInput.substring(base64Index)
         if(base64Index !== 7)
         fs.writeFile(
-        path.join(this._file_path, this._file_name), 
+        filePath,
         Buffer.from(base64Image, 'base64'), 
-        (err) => err ? rejact(err) : resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${this._file_name}`)
-        )
+        (err) => {
+            if(err) throw rejact(err);
+            sharp(filePath)
+            .resize({ width: 800 }) // O'lchamni o'zgartiramiz (masalan, 800 piksel)
+            .toFormat('webp') // WebP formatga o'tkazamiz
+            .toFile(outputPath, (err, info) => {
+              if (err) throw err;
+                fs.unlinkSync(filePath);
+                resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${this._file_name}`)
+            });
+        }
+
+    )
         
     })
 
