@@ -78,7 +78,7 @@ class Base64ToFile {
         filePath,
         Buffer.from(base64Image, 'base64'), 
         (err) => {
-            if(err) throw rejact(err);
+            if(err) rejact(err);
             sharp(filePath)
             .resize({ width: 800 })
             .toFormat('webp') 
