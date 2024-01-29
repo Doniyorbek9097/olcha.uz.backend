@@ -78,12 +78,12 @@ class Base64ToFile {
         filePath,
         Buffer.from(base64Image, 'base64'), 
         (err) => {
-            if(err) return rejact(err);
+            if(err) throw err;
             sharp(filePath)
             .resize({ width: 800 })
             .toFormat('webp') 
             .toFile(outputPath, (err, info) => {
-              if (err) return rejact(err);
+              if (err) throw err;
               if(fs.existsSync(filePath)) 
                 fs.unlinkSync(filePath);
             else {
