@@ -86,7 +86,9 @@ class Base64ToFile {
               if (err) rejact(err);
               if(fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
-              }
+              } else {
+                console.log("fayl topilmadi");
+              } 
            
                return resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${newFileName}`)
             });
