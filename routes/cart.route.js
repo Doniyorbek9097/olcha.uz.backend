@@ -9,7 +9,6 @@ router.post("/add-cart", async (req, res) => {
         const { products: { product, quantity }, user: userId, cart_id: cartId } = req.body;
 
         let cart = await cartModel.findOne({ "_id": cartId });
-        console.log(cart);
         // cart not found 
         if (!cart) {
             const data = await cartModel(req.body).save();
