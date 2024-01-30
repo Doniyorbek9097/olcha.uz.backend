@@ -47,53 +47,43 @@ class Base64ToFile {
 
     save() {
         return new Promise((resolve, rejact) => {
-            if(Array.isArray(this._bufferInput) && this._bufferInput !== null) {
-                const filePaths = [];
-                for (const file of this._bufferInput) {
-                if(typeof file !== 'string' || !file.includes("base64")) return;
-                    const filePath = path.join(this._file_path, this._file_name);
-                    const matches = file.toString().match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-                    fs.writeFile(
-                        filePath, 
-                        Buffer.from(matches[2], 'base64'),
-                        (err) => err ? rejact(err) : filePaths.push(`${this.request.protocol}://${this.request.headers.host}/uploads/${this._file_name}`)
-                    );
-                }
+            // if(Array.isArray(this._bufferInput) && this._bufferInput !== null) {
+            //     const filePaths = [];
+            //     for (const file of this._bufferInput) {
+            //     if(typeof file !== 'string' || !file.includes("base64")) return;
+            //         const filePath = path.join(this._file_path, this._file_name);
+            //         const matches = file.toString().match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+            //         fs.writeFile(
+            //             filePath, 
+            //             Buffer.from(matches[2], 'base64'),
+            //             (err) => err ? rejact(err) : filePaths.push(`${this.request.protocol}://${this.request.headers.host}/uploads/${this._file_name}`)
+            //         );
+            //     }
         
-                resolve(filePaths)
-            }
+            //     resolve(filePaths)
+            // }
         
 
         if(typeof this._bufferInput !== 'string' || this._bufferInput.includes("base64") == false)
         resolve(this._bufferInput);
-
-        const filePath = path.join(this._file_path, this._file_name);
-        const newFileName = `image-${generateOTP(10)}.webp`;
-        const outputPath = path.join(this._file_path, newFileName);
+        const filePath = path.join(this._file_path, this._file_name)
 
         const base64Index = this._bufferInput.indexOf(';base64,') + ';base64,'.length;
-        const base64Image = this._bufferInput.substring(base64Index)
-        if(base64Index !== 7)
-        fs.writeFile(
-        filePath,
-        Buffer.from(base64Image, 'base64'), 
-        (err) => {
-            if(err) throw err;
-            sharp(filePath)
+        const base64Image = this._bufferInput.substring(base64Index);
+        const imageBuffer = Buffer.from(base64Image, 'base64');
+        if(base64Index !== 7) {
+            sharp(imageBuffer)
             .resize({ width: 800 })
             .toFormat('webp') 
-            .toFile(outputPath, (err, info) => {
-              if (err) throw err;
-              if(fs.existsSync(filePath)) 
-                fs.unlinkSync(filePath);
-            else {
-                console.log('ishlamadi');
-            }
-                resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${newFileName}`)
-            });
-        }
+            .toFile(filePath, (err) => {
+                if (err) throw err;
+                resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${this._file_name}`);
 
-    )
+            });
+
+        }
+        
+
         
     })
 
