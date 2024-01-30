@@ -86,7 +86,7 @@ class Base64ToFile {
               if (err) console.log(err);
               
               if(fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
+                fs.unlink(filePath, (err) => err && console.log(err));
               } else {
                 console.log("fayl topilmadi");
               } 
