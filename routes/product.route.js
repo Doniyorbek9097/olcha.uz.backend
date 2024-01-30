@@ -28,6 +28,7 @@ router.post("/product", async (req, res) => {
         return res.status(200).json(newProduct);
 
     } catch (error) {
+        console.log(error);
             const { images } = req.body;
             // if(colors?.length > 0) {
             //     for (const color of colors) {
@@ -71,44 +72,44 @@ router.get("/products", async (req, res) => {
 
 
 // search products 
-router.get("/product/:category", async (req, res) => {
-    try {
-        let lang = req.headers['lang'];
-        let categorySlug = req.params.category;
-        let products = await productModel.find()
-            .populate("parentCategory")
-            .populate("subCategory")
-            .populate("childCategory")
-            .populate("brend")
+// router.get("/product/:category", async (req, res) => {
+//     try {
+//         let lang = req.headers['lang'];
+//         let categorySlug = req.params.category;
+//         let products = await productModel.find()
+//             .populate("parentCategory")
+//             .populate("subCategory")
+//             .populate("childCategory")
+//             .populate("brend")
 
-        products = products.filter(product => {
-            if (product.parentCategory.slug == categorySlug) return product;
-            if (product.subCategory.slug == categorySlug) return product;
-            if (product.childCategory.slug == categorySlug) return product;
+//         products = products.filter(product => {
+//             if (product.parentCategory.slug == categorySlug) return product;
+//             if (product.subCategory.slug == categorySlug) return product;
+//             if (product.childCategory.slug == categorySlug) return product;
 
-        })
+//         })
 
-        products = JSON.stringify(products);
-        products = JSON.parse(products);
-        if (!lang) return res.json({ result: products });
-        products = langReplace(products, lang);
-        for (const product of products) {
-            // product.brend.discription = langReplace(product.brend?.discription, lang);
-            product.properteis = langReplace(product.properteis, lang);
-            product.parentCategory = langReplace(product.parentCategory, lang);
-            product.subCategory = langReplace(product.subCategory, lang);
-            product.childCategory = langReplace(product.childCategory, lang);
+//         products = JSON.stringify(products);
+//         products = JSON.parse(products);
+//         if (!lang) return res.json({ result: products });
+//         products = langReplace(products, lang);
+//         for (const product of products) {
+//             // product.brend.discription = langReplace(product.brend?.discription, lang);
+//             product.properteis = langReplace(product.properteis, lang);
+//             product.parentCategory = langReplace(product.parentCategory, lang);
+//             product.subCategory = langReplace(product.subCategory, lang);
+//             product.childCategory = langReplace(product.childCategory, lang);
 
-        }
-        return res.json(products);
-    } catch (error) {
-        console.log(error)
-    }
-});
+//         }
+//         return res.json(products);
+//     } catch (error) {
+//         console.log(error)
+//     }
+// });
 
 
 
-// one product by id 
+// one product by slug
 router.get("/product-slug/:slug", async (req, res) => {
     try {
 
@@ -136,6 +137,28 @@ router.get("/product-slug/:slug", async (req, res) => {
         console.log(error);
     }
 });
+
+
+
+// one product by id 
+router.get("/product/:id", async (req, res) => {
+    try {
+
+        let color = req.query.color || "";
+
+
+        let product = await productModel.findById(req.params.id)
+            .populate("parentCategory")
+            .populate("subCategory")
+            .populate("childCategory")
+            // .populate("shop");
+
+        return res.status(200).json(product)
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 
 
 // update product 

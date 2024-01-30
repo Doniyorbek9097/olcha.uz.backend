@@ -70,7 +70,7 @@ class Base64ToFile {
         const filePath = path.join(this._file_path, this._file_name);
         const newFileName = `image-${generateOTP(10)}.webp`;
         const outputPath = path.join(this._file_path, newFileName);
-
+        
         const base64Index = this._bufferInput.indexOf(';base64,') + ';base64,'.length;
         const base64Image = this._bufferInput.substring(base64Index)
         if(base64Index !== 7)
@@ -84,11 +84,10 @@ class Base64ToFile {
             .toFormat('webp') 
             .toFile(outputPath, (err, info) => {
               if (err) throw err;
-              if(fs.existsSync(filePath)) 
+              if(fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
-            else {
-                console.log('ishlamadi');
-            }
+              }
+           
                 resolve(`${this.request.protocol}://${this.request.headers.host}/uploads/${newFileName}`)
             });
         }
