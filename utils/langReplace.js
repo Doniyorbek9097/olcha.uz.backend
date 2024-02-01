@@ -1,5 +1,6 @@
 module.exports = function langReplace(elem, lang) {
     if(Array.isArray(elem)) {
+        if(elem.length <= 0) return elem;
         for (const item of elem) {
             const objKeys = Object.keys(item);
             for (const val of objKeys) {  

@@ -47,6 +47,9 @@ class Base64ToFile {
 
     save() {
         return new Promise((resolve, rejact) => {
+            if(!fs.existsSync(this._file_path)) {
+                fs.mkdirSync(path.join(__dirname, "../uploads"))
+            }
             // if(Array.isArray(this._bufferInput) && this._bufferInput !== null) {
             //     const filePaths = [];
             //     for (const file of this._bufferInput) {

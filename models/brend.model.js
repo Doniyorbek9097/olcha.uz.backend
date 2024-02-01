@@ -1,6 +1,6 @@
-const mongooose = require("mongoose");
+const mongoose = require("mongoose");
 
-const brendSchema = mongooose.Schema({
+const brendSchema = mongoose.Schema({
     name: {
         type: String,
         default: ""
@@ -17,8 +17,8 @@ const brendSchema = mongooose.Schema({
     },
 
     image: {
-        type: String,
-        default:""
+        uz: String,
+        ru: String
     },
 
     logo: {
@@ -31,7 +31,22 @@ const brendSchema = mongooose.Schema({
        ru:String
     },
 
-});
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }
+
+}, { timestamps: true });
 
 
-module.exports = mongooose.model("Brend", brendSchema);
+brendSchema.set("toObject", { virtuals: true });
+brendSchema.set("toJSON", { virtuals: true });
+
+brendSchema.virtual("products", {
+    "ref": "Product",
+    localField: "_id",
+    foreignField: "brend",
+})
+
+
+module.exports = mongoose.model("Brend", brendSchema);

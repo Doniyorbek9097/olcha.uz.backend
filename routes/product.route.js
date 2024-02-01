@@ -121,10 +121,10 @@ router.get("/product-slug/:slug", async (req, res) => {
             .populate("parentCategory")
             .populate("subCategory")
             .populate("childCategory")
+            .populate("brend")
             // .populate("shop");
 
-        product = JSON.stringify(product);
-        product = JSON.parse(product);
+        product = JSON.parse(JSON.stringify(product));
         if (!lang) return res.json({ result: product });
 
         product = langReplace(product, lang);
