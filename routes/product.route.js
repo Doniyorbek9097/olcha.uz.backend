@@ -151,6 +151,8 @@ router.get("/product/:id", async (req, res) => {
             .populate("parentCategory")
             .populate("subCategory")
             .populate("childCategory")
+            .populate("brend")
+
             // .populate("shop");
 
         return res.status(200).json(product)
