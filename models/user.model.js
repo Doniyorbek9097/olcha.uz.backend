@@ -22,12 +22,12 @@ const userSchema = new mongooose.Schema({
     password: {
         type:String,
     },
-    // email: {
-    //     type: String,
-    //     unique: true,
-    //     index: true,
-    //     lowarcase: true
-    // },
+    email: {
+        type: String,
+        unique: true,
+        index: true,
+        lowarcase: true
+    },
 
     isBlocked: {
         type: Boolean,

@@ -8,7 +8,7 @@ const { Base64ToFile } = require("../utils/base64ToFile");
 
 // create new Product 
 router.post("/product", async (req, res) => {
-    const { images } = req.body; 
+    const { images } = req.body;
     req.body.slug = slugify(req.body.name.uz);
     req.body.images = [];
 
@@ -21,37 +21,37 @@ router.post("/product", async (req, res) => {
     // for (const color of req.body.colors) {
     //         color.images =  await new Base64ToFile(req).bufferInput(color.images).save();
     //     }
-        
+
     try {
-        
+
         const newProduct = await new productModel(req.body).save();
         return res.status(200).json(newProduct);
 
     } catch (error) {
         console.log(error);
-            const { images } = req.body;
-            // if(colors?.length > 0) {
-            //     for (const color of colors) {
-            //         for (const image of color.images) {
-            //             fs.unlink(
-            //                 path.join(__dirname, `../uploads/${path.basename(image)}`),
-            //                 (err) => err && console.log(err)    
-            //             )
-            //         }
-            //     }
-            // }
+        const { images } = req.body;
+        // if(colors?.length > 0) {
+        //     for (const color of colors) {
+        //         for (const image of color.images) {
+        //             fs.unlink(
+        //                 path.join(__dirname, `../uploads/${path.basename(image)}`),
+        //                 (err) => err && console.log(err)    
+        //             )
+        //         }
+        //     }
+        // }
 
-            if(images?.length > 0) {
-                for (const image of images) {
-                    fs.unlink(
-                        path.join(__dirname, `../uploads/${path.basename(image)}`),
-                        (err) => err && console.log(err)    
-                    )
-                }
+        if (images?.length > 0) {
+            for (const image of images) {
+                fs.unlink(
+                    path.join(__dirname, `../uploads/${path.basename(image)}`),
+                    (err) => err && console.log(err)
+                )
             }
-            
-            return res.status(500).json("serverda Xatolik")
         }
+
+        return res.status(500).json("serverda Xatolik")
+    }
 });
 
 // get all products 
@@ -122,7 +122,7 @@ router.get("/product-slug/:slug", async (req, res) => {
             .populate("subCategory")
             .populate("childCategory")
             .populate("brend")
-            // .populate("shop");
+        // .populate("shop");
 
         product = JSON.parse(JSON.stringify(product));
         if (!lang) return res.json({ result: product });
@@ -153,7 +153,7 @@ router.get("/product/:id", async (req, res) => {
             .populate("childCategory")
             .populate("brend")
 
-            // .populate("shop");
+        // .populate("shop");
 
         return res.status(200).json(product)
     } catch (error) {
@@ -165,9 +165,11 @@ router.get("/product/:id", async (req, res) => {
 
 // update product 
 router.put("/product/:id", async (req, res) => {
+    const id = req.params.id;
+    req.body.slug = slugify(req.body.name.uz);
     try {
         const updated = await productModel.findByIdAndUpdate(req.params.id, req.body);
-        res.json({ result: updated });
+        res.status(200).json(product);
     } catch (error) {
 
     }
@@ -177,31 +179,31 @@ router.put("/product/:id", async (req, res) => {
 router.delete("/product/:id", async (req, res) => {
     try {
         const deleted = await productModel.findByIdAndDelete(req.params.id);
-        const {images, colors} = deleted;
+        const { images, colors } = deleted;
 
-        if(colors.length > 0) {
+        if (colors.length > 0) {
             for (const color of colors) {
                 for (const image of color.images) {
                     fs.unlink(
                         path.join(__dirname, `../uploads/${path.basename(image)}`),
-                        (err) => err && console.log(err)    
+                        (err) => err && console.log(err)
                     )
                 }
             }
         }
 
-        if(images.length > 0) {
+        if (images.length > 0) {
             for (const image of images) {
                 fs.unlink(
                     path.join(__dirname, `../uploads/${path.basename(image)}`),
-                    (err) => err && console.log(err)    
+                    (err) => err && console.log(err)
                 )
             }
         }
-        
 
-    
-    return res.status(200).json({ result: deleted });
+
+
+        return res.status(200).json({ result: deleted });
 
     } catch (error) {
         console.log(error);

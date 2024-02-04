@@ -90,6 +90,26 @@ router.get("/user/:id", checkToken,  async (req, res) => {
 });
 
 
+router.get("/users", async (req, res) => {
+    try {
+        const users = await userModel.find();
+        res.status(200).json(users)
+    } catch (error) {
+        res.status(500).json(`Serverda xatosi: ${error.message}`)
+    }
+});
+
+
+router.delete("/user-delete/:id", async (req, res) => {
+    try {
+        const deleted = await userModel.findByIdAndDelete(req.params.id);
+        res.status(200).json(deleted);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(`Server xatosi: ${error.message}`)
+    }
+})
+
 // router.post("/register", async (req, res) => {
 //     try {
 
@@ -256,16 +276,6 @@ router.get("/user/:id", checkToken,  async (req, res) => {
 // });
 
 
-
-
-// router.get("/users", async (req, res) => {
-//     try {
-//         const users = await userModel.find();
-//         res.json(users)
-//     } catch (error) {
-
-//     }
-// });
 
 
 // router.post("/reset-password/:id/:token", async (req, res) => {
