@@ -167,6 +167,8 @@ router.get("/product/:id", async (req, res) => {
 router.put("/product/:id", async (req, res) => {
     const id = req.params.id;
     req.body.slug = slugify(req.body.name.uz);
+    req.body.discount = ((req.body.orginal_price - req.body.sale_price) / req.body.orginal_price) * 100; 
+
     try {
         const updated = await productModel.findByIdAndUpdate(req.params.id, req.body);
         res.status(200).json(product);
