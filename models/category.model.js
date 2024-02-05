@@ -40,6 +40,10 @@ const Schema = mongoose.Schema({
         type: String
     },
 
+    brendId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'Brend'
+    },
 
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -52,13 +56,14 @@ const Schema = mongoose.Schema({
     }
 },
 
-    { timestamps: true }
+    { 
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    }
 
 );
 
-
-Schema.set("toObject", { virtuals: true });
-Schema.set("toJSON", { virtuals: true });
 
 Schema.virtual("products", {
     "ref": "Product",

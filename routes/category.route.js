@@ -38,6 +38,8 @@ router.get("/category", async (req, res) => {
 
         let categories = await categoryModel.find()
         .populate("products", "name slug price images")
+        .populate("brendId", "name slug")
+
 
         let categoryList = nestedCategories(categories);
         categoryList = JSON.stringify(categoryList);

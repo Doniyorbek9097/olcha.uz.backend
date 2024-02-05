@@ -18,6 +18,7 @@ module.exports = function nestedCategories(categories, parentId = null) {
             icon: cate.icon,
             products: cate.products,
             parentId: cate.parentId,
+            brned: cate.brendId,
             createdBy: cate.createdBy,
             createdAt: cate.createdAt,
             updatedAt: cate.updatedAt,

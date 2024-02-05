@@ -48,7 +48,7 @@ router.post("/brend", async(req, res) => {
 router.get("/brend/:slug", async(req, res) => {
     try {
         const { slug } = req.params;
-        const brend = await brendModel.findOne({slug: slug});
+        const brend = await brendModel.findOne({slug: slug}).populate("categories", "name image slug").populate("products")
         return res.status(200).json(brend);
 
     } catch (error) {

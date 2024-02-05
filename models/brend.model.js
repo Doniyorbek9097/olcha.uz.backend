@@ -46,6 +46,12 @@ brendSchema.virtual("products", {
     "ref": "Product",
     localField: "_id",
     foreignField: "brend",
+});
+
+brendSchema.virtual("categories", {
+    "ref": "Category",
+    localField: "_id",
+    foreignField: "brendId",
 })
 
 
