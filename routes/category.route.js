@@ -115,11 +115,15 @@ router.put("/category/:id", async (req, res) => {
     const { image, left_banner, top_banner } = req.body;
     const category = await categoryModel.findById(req.params.id);
 
+    !req.body.image && fs.unlink(path.join(__dirname, `../uploads/${category.image}`), (err) => err && console.log(err.message))
     req.body.image = await new Base64ToFile(req).bufferInput(image).fileName(category.image).save();
     // left banner updated 
     const findLeft = await category?.left_banner.find(banner => banner);
 
+
     for (const banner of left_banner) {
+        !banner.image.uz && fs.unlink(path.join(__dirname, `../uploads/${banner.image.uz}`), (err) => err && console.log(err.message));
+        !banner.image.ru && fs.unlink(path.join(__dirname, `../uploads/${banner.image.ru}`), (err) => err && console.log(err.message));   
         banner.image.uz = await new Base64ToFile(req).bufferInput(banner?.image.uz).fileName(findLeft?.image.uz).save();
         banner.image.ru = await new Base64ToFile(req).bufferInput(banner?.image.ru).fileName(findLeft?.image.ru).save();
         banner.slug = banner.slug;
@@ -131,6 +135,8 @@ router.put("/category/:id", async (req, res) => {
     const findTop = await category?.top_banner;
 
     for (const i in top_banner) {
+        !top_banner[i].image.uz && fs.unlink(path.join(__dirname, `../uploads/${findTop[i]?.image.uz}`), (err) => err && console.log(err.message));
+        !top_banner[i].image.ru && fs.unlink(path.join(__dirname, `../uploads/${findTop[i]?.image.ru}`), (err) => err && console.log(err.message));
         top_banner[i].image.uz = await new Base64ToFile(req).bufferInput(top_banner[i].image.uz).fileName(findTop[i]?.image.uz).save();
         top_banner[i].image.ru = await new Base64ToFile(req).bufferInput(top_banner[i].image.ru).fileName(findTop[i]?.image.ru).save();
         top_banner[i].slug = slugify(top_banner[i].slug);
