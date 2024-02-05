@@ -47,22 +47,14 @@ const Schema = mongoose.Schema({
         min: 1    
     },
 
-    price: {
+    orginal_price: {
         type:Number,
         required:true
     },
 
-    totalPrice: {
-        type: Number
-    },
-
-    isDiscount: {
-        type:Boolean,
-        default:false
-    },
-
-    discountPercent: {
-        type:Number
+    sale_price: {
+        type: Number,
+        required: true
     },
 
 
@@ -136,6 +128,10 @@ const Schema = mongoose.Schema({
     },
 
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+
+    discount: {
+        type: Number
+    }
     
 }, 
 
@@ -147,12 +143,9 @@ const Schema = mongoose.Schema({
 
 );
 
-Schema.pre("save", function(next) {
-    if(this.discountPercent) {
-        this.totalPrice = this.price - this.price * this.discount_percent / 100;
-    } 
 
-    next();
+Schema.pre("save", async function(next) {
+    this.discount = ((this.orginal_price - this.sale_price) / this.orginal_price) * 100; 
 })
 
 

@@ -37,8 +37,8 @@ router.get("/category", async (req, res) => {
         let search = req.query.search || "";
 
         let categories = await categoryModel.find()
-        .populate("products", "name slug price images")
-        .populate("brendId", "name slug")
+        .populate("products")
+        .populate("brendId")
 
 
         let categoryList = nestedCategories(categories);
