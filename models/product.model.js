@@ -145,7 +145,7 @@ const Schema = mongoose.Schema({
 
 
 Schema.pre("save", async function(next) {
-    this.discount = ((this.orginal_price - this.sale_price) / this.orginal_price) * 100; 
+    this.discount = parseInt(((this.orginal_price - this.sale_price) / this.orginal_price) * 100); 
 })
 
 
