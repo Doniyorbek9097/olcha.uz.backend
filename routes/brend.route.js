@@ -51,10 +51,6 @@ router.get("/brend/:slug", async(req, res) => {
         let brend = await brendModel.findOne({slug: slug}).populate("categories", "name image slug").populate("products");
         brend = JSON.parse(JSON.stringify(brend));
         if(!lang) return res.status(200).json(brend);
-
-        brend.title = langReplace(brend.title, lang);
-        brend.discription = langReplace(brend.discription, lang);
-        brend.image = langReplace(brend.image, lang);
         brend = langReplace(brend, lang);
         brend.categories = langReplace(brend.categories, lang);
 
