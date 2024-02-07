@@ -5,7 +5,6 @@ const langReplace  = require("../utils/langReplace");
 const { Base64ToFile } = require("../utils/base64ToFile");
 const fs = require("fs");
 const path = require("path");
-const { findOne } = require("../models/user.model");
 
 
 router.get("/brends", async (req, res) => {
@@ -48,7 +47,17 @@ router.post("/brend", async(req, res) => {
 router.get("/brend/:slug", async(req, res) => {
     try {
         const { slug } = req.params;
-        const brend = await brendModel.findOne({slug: slug}).populate("categories", "name image slug").populate("products")
+        const { lang } = req.headers;
+        let brend = await brendModel.findOne({slug: slug}).populate("categories", "name image slug").populate("products");
+        brend = JSON.parse(JSON.stringify(brend));
+        if(!lang) return res.status(200).json(brend);
+
+        brend.title = langReplace(brend.title, lang);
+        brend.discription = langReplace(brend.discription, lang);
+        brend.image = langReplace(brend.image, lang);
+        brend = langReplace(brend, lang);
+        brend.categories = langReplace(brend.categories, lang);
+
         return res.status(200).json(brend);
 
     } catch (error) {

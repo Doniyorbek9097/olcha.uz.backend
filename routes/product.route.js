@@ -128,7 +128,7 @@ router.get("/product-slug/:slug", async (req, res) => {
         if (!lang) return res.json({ result: product });
 
         product = langReplace(product, lang);
-        product.properteis = product.properteis.map(item => langReplace(item, lang));
+        product.properteis = product.properteis.flatMap(item => item[lang]);
         product.parentCategory = langReplace(product.parentCategory, lang);
         product.subCategory = langReplace(product.subCategory, lang);
         product.childCategory = langReplace(product.childCategory, lang);
