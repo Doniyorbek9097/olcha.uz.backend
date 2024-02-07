@@ -146,7 +146,6 @@ router.get("/product/:id", async (req, res) => {
 
         let color = req.query.color || "";
 
-
         let product = await productModel.findById(req.params.id)
             .populate("parentCategory")
             .populate("subCategory")
