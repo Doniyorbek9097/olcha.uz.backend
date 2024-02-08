@@ -47,8 +47,7 @@ router.get("/cart/:id",  async (req, res) => {
             .populate("products.product");
 
         if (cart) {
-            cart = JSON.stringify(cart);
-            cart = JSON.parse(cart);
+            cart = JSON.parse(JSON.stringify(cart));
 
             cart.products = cart.products.map(item => {
                 item.product = langReplace(item.product, lang);
@@ -72,11 +71,13 @@ router.get("/cart/:id",  async (req, res) => {
 
 router.delete("/cart-delete/:id/:product_id", async (req, res) => {
     try {
-        const cart = await cartModel.findById(req.params.id);
-       const productIndex = cart.products.findIndex(item => item.product._id.toString() === req.params.product_id.toString());
-       cart.products.splice(productIndex, 1);
-       const SavedCart = await cart.save();
-       return res.status(200).json(SavedCart)
+        if(mongoose.isValidObjectId(req.params.id)) {
+            const cart = await cartModel.findById(req.params.id);
+            const productIndex = cart.products.findIndex(item => item.product._id.toString() === req.params.product_id.toString());
+            cart.products.splice(productIndex, 1);
+            const SavedCart = await cart.save();
+            return res.status(200).json(SavedCart)
+        }
     } catch (error) {
         console.log(error)
        return res.status(500).json(error.message)

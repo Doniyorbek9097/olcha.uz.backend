@@ -115,7 +115,6 @@ router.get("/product-slug/:slug", async (req, res) => {
 
         let color = req.query.color || "";
 
-
         let lang = req.headers['lang'];
         let product = await productModel.findOne({ slug: req.params.slug })
             .populate("parentCategory")

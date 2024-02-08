@@ -37,7 +37,12 @@ router.get("/category", async (req, res) => {
         let search = req.query.search || "";
 
         let categories = await categoryModel.find()
-        .populate("products")
+        .populate({
+            path:"products",
+            populate: {
+                path: "brend"
+            }
+        })
         .populate("brendId")
 
 
