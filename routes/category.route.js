@@ -37,12 +37,9 @@ router.get("/category", async (req, res) => {
         let search = req.query.search || "";
 
         let categories = await categoryModel.find()
-        .populate({
-            path:"products",
-            populate: {
-                path: "brend"
-            }
-        })
+        .populate("parentProducts")
+        .populate("subProducts")
+        .populate("childProducts")
         .populate("brendId")
 
 
@@ -55,7 +52,9 @@ router.get("/category", async (req, res) => {
 
         for (const category of categoryList) {
             category.children = langReplace(category.children, lang);
-            category.products = langReplace(category.products, lang);
+            category.parentProducts = langReplace(category.parentProducts, lang);
+            category.subProducts = langReplace(category.subProducts, lang);
+            category.childProducts = langReplace(category.childProducts, lang);
             category.left_banner = langReplace(category.left_banner, lang);
             category.top_banner = langReplace(category.top_banner, lang);
 
@@ -97,18 +96,37 @@ router.get("/category/:id", async (req, res) => {
 
 
 // Get by slug name 
-router.get("/category/:slug", async (req, res) => {
+router.get("/category-slug/:slug", async (req, res) => {
     try {
         const lang = req.headers["lang"];
-        let category = await categoryModel.findOne({ slug: req.params.slug });
-        if (!category) return res.status(404).send("Category topilmadi")
-        if (!lang) return res.status(200).json({ result: category });
-        category = JSON.stringify(category);
-        category = JSON.parse(category);
-        category = langReplace(category, lang);
-        category.products = langReplace(category.products, lang);
+        let category = await categoryModel.find({ slug: req.params.slug })
+        .populate("parentProducts")
+        .populate("subProducts")
+        .populate("childProducts");
 
-        return res.status(200).json(category);
+        if (!category) return res.status(404).send("Category topilmadi");
+    
+        let categoryList;
+        
+        categoryList = JSON.stringify(category);
+        categoryList = JSON.parse(categoryList);
+        if (!lang) return res.json(categoryList);
+
+        categoryList = langReplace(categoryList, lang);
+
+        if (!lang) return res.status(200).json(categoryList);
+       
+        for (const category of categoryList) {
+            const children = await categoryModel.find({parentId: category._id});
+            category.children = langReplace(JSON.parse(JSON.stringify(children)), lang);
+            category.parentProducts = langReplace(category.parentProducts, lang);
+            category.subProducts = langReplace(category.subProducts, lang);
+            category.childProducts = langReplace(category.childProducts, lang);
+            category.left_banner = langReplace(category.left_banner, lang);
+            category.top_banner = langReplace(category.top_banner, lang);
+        }
+
+        return res.status(200).json(categoryList);
     } catch (error) {
         if (error) {
             console.log(error);

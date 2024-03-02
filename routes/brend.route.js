@@ -52,8 +52,7 @@ router.get("/brend/:slug", async(req, res) => {
         brend = JSON.parse(JSON.stringify(brend));
         if(!lang) return res.status(200).json(brend);
         brend = langReplace(brend, lang);
-        brend.categories = langReplace(brend.categories, lang);
-
+        (brend.categories.lengh > 0) && (brend.categories = langReplace(brend.categories, lang));
         return res.status(200).json(brend);
 
     } catch (error) {

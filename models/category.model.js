@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const { productModel } = require("./product.model");
+
 const Schema = mongoose.Schema({
     name: {
         uz: {
@@ -65,10 +67,26 @@ const Schema = mongoose.Schema({
 );
 
 
-Schema.virtual("products", {
-    "ref": "Product",
+
+Schema.virtual("parentProducts", {
+    ref: "Product",
     localField: "_id",
     foreignField: "parentCategory",
+})
+
+
+
+Schema.virtual("subProducts", {
+    ref: "Product",
+    localField: "_id",
+    foreignField: "subCategory",
+})
+
+
+Schema.virtual("childProducts", {
+    ref: "Product",
+    localField: "_id",
+    foreignField: "childCategory",
 })
 
 
