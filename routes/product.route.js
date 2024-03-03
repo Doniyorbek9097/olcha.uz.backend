@@ -118,9 +118,20 @@ router.get("/product-slug/:slug", async (req, res) => {
         let lang = req.headers['lang'];
         let product = await productModel.findOne({ slug: req.params.slug })
             .populate("parentCategory")
-            .populate("subCategory")
-            .populate("childCategory")
-            .populate("brend")
+            .populate({
+                path:"subCategory",
+                populate: "subProducts"
+            })
+            .populate({
+                path: "childCategory",
+                populate: "childProducts"
+            })
+            .populate({
+                path:"brend",
+                populate: {
+                    path:'products'
+                }
+            })
         // .populate("shop");
 
         product = JSON.parse(JSON.stringify(product));
@@ -130,10 +141,16 @@ router.get("/product-slug/:slug", async (req, res) => {
         product.properteis = product?.properteis.flatMap(item => item[lang]);
         product.parentCategory = langReplace(product.parentCategory, lang);
         product.subCategory = langReplace(product.subCategory, lang);
+        product.subCategory.subProducts = langReplace(product.subCategory?.subProducts, lang).filter(item => item._id !== product._id);
         product.childCategory = langReplace(product.childCategory, lang);
-        return res.status(200).json(product)
+        product.childCategory.childProducts = langReplace(product.childCategory?.childProducts, lang).filter(item => item._id !== product._id);
+        product.brend = langReplace(product.brend, lang);
+        product.brend.products = langReplace(product.brend?.products, lang).filter(item => item._id !== product._id);
+
+        return res.status(200).json(product);
     } catch (error) {
         console.log(error);
+        return res.status(500).send("Server Ishlamayapti");
     }
 });
 
@@ -142,7 +159,7 @@ router.get("/product-slug/:slug", async (req, res) => {
 // one product by id 
 router.get("/product/:id", async (req, res) => {
     try {
-
+        const lang = req.headers['lang'];
         let color = req.query.color || "";
 
         let product = await productModel.findById(req.params.id)
@@ -150,9 +167,11 @@ router.get("/product/:id", async (req, res) => {
             .populate("subCategory")
             .populate("childCategory")
             .populate("brend")
-
         // .populate("shop");
 
+        product = JSON.parse(JSON.stringify(product));
+        product.brend = langReplace(product.brend, lang);
+        console.log(product.brend);
         return res.status(200).json(product)
     } catch (error) {
         console.log(error);
