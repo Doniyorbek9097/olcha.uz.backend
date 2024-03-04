@@ -30,18 +30,20 @@ router.post("/category", async (req, res) => {
 router.get("/category", async (req, res) => {
     try {
         const lang = req.headers["lang"];
-        let length = await categoryModel.countDocuments();
-
         let page = parseInt(req.query.page) - 1 || 0;
-        let limit = parseInt(req.query.limit) || 10;
+        let limit = parseInt(req.query.limit) || 1;
         let search = req.query.search || "";
 
         let categories = await categoryModel.find()
-        .populate("parentProducts")
+        .populate({
+            path:"parentProducts",
+            limit:limit,
+            sort:{createdAt: -1},
+            skip: page
+        })
         .populate("subProducts")
         .populate("childProducts")
         .populate("brendId")
-
 
         let categoryList = nestedCategories(categories);
         categoryList = JSON.stringify(categoryList);
@@ -62,6 +64,7 @@ router.get("/category", async (req, res) => {
                 subCategory.children = langReplace(subCategory.children, lang);
             }
         }
+
 
         return res.json(categoryList);
     } catch (err) {
@@ -99,23 +102,36 @@ router.get("/category/:id", async (req, res) => {
 router.get("/category-slug/:slug", async (req, res) => {
     try {
         const lang = req.headers["lang"];
+        let page = parseInt(req.query.page) - 1 || 0;
+        let limit = parseInt(req.query.limit) || 2;
+        let search = req.query.search || "";
+
         let category = await categoryModel.find({ slug: req.params.slug })
-        .populate("parentProducts")
-        .populate("subProducts")
-        .populate("childProducts");
+        .populate({
+            path:"parentProducts",
+            limit:limit,
+            sort:{createdAt: -1},
+            skip: page
+        })
+        .populate({
+            path: "subProducts",
+            limit:limit,
+            sort:{createdAt: -1},
+            skip: page
+        })
+        .populate({
+            path: "childProducts",
+            limit:limit,
+            sort:{createdAt: -1},
+            skip: page
+        });
 
         if (!category) return res.status(404).send("Category topilmadi");
-    
-        let categoryList;
-        
-        categoryList = JSON.stringify(category);
-        categoryList = JSON.parse(categoryList);
-        if (!lang) return res.json(categoryList);
+        if (!lang) return res.status(200).json(categoryList);
 
+        let categoryList = JSON.parse(JSON.stringify(category));
         categoryList = langReplace(categoryList, lang);
 
-        if (!lang) return res.status(200).json(categoryList);
-       
         for (const category of categoryList) {
             const children = await categoryModel.find({parentId: category._id});
             category.children = langReplace(JSON.parse(JSON.stringify(children)), lang);
@@ -126,7 +142,11 @@ router.get("/category-slug/:slug", async (req, res) => {
             category.top_banner = langReplace(category.top_banner, lang);
         }
 
-        return res.status(200).json(categoryList);
+        return res.status(200).json({
+            page: page+1,
+            limit,
+            data: categoryList
+        });
     } catch (error) {
         if (error) {
             console.log(error);

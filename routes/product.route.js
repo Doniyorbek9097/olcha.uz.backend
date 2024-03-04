@@ -138,14 +138,13 @@ router.get("/product-slug/:slug", async (req, res) => {
         if (!lang) return res.json({ result: product });
 
         product = langReplace(product, lang);
-        product.properteis = product?.properteis.flatMap(item => item[lang]);
+        product.properteis = product?.properteis?.flatMap(item => item[lang]);
         product.parentCategory = langReplace(product.parentCategory, lang);
         product.subCategory = langReplace(product.subCategory, lang);
-        product.subCategory.subProducts = langReplace(product.subCategory?.subProducts, lang).filter(item => item._id !== product._id);
+        product.subCategory.subProducts = langReplace(product.subCategory?.subProducts, lang)?.filter(item => item._id !== product._id);
         product.childCategory = langReplace(product.childCategory, lang);
-        product.childCategory.childProducts = langReplace(product.childCategory?.childProducts, lang).filter(item => item._id !== product._id);
-        product.brend = langReplace(product.brend, lang);
-        product.brend.products = langReplace(product.brend?.products, lang).filter(item => item._id !== product._id);
+        product.childCategory.childProducts = langReplace(product.childCategory?.childProducts, lang)?.filter(item => item._id !== product._id);
+        product.brend = langReplace(product?.brend, lang);
 
         return res.status(200).json(product);
     } catch (error) {

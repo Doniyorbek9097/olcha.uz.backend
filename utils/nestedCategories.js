@@ -31,5 +31,6 @@ module.exports = function nestedCategories(categories, parentId = null) {
             children: nestedCategories(categories, cate._id)
         })
     }
+
     return categoryList;
 }
