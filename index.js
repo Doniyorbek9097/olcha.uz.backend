@@ -5,18 +5,6 @@ require("dotenv/config");
 require("./config/db");
 const routes = require("./routes");
 const app = express();
-const i18n = require("./locales");
-const path = require("path");
-const { isEqual } = require("./utils/isEqual");
-const fs = require("fs");
-
-
-const array1 = [{ name: "john" }];
-const array2 = [{ name: "jon" }];
-
-const areArraysEqual =  array1.every((item, index) => item.name === array2[index].name);
-console.log(areArraysEqual); // false
-
 
 
 app.use(cors());

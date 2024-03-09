@@ -2,8 +2,8 @@ const mongooose = require("mongoose");
 
 const Schema = new mongooose.Schema({
     image: {
-        uz:String,
-        ru:String
+        type: String,
+        intl: true
     },
     slug:{
         type:String,

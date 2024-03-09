@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const productModel = require("../models/product.model");
+const categoryModel = require("../models/category.model");
 const slugify = require("slugify");
 const langReplace = require("../utils/langReplace");
 const path = require("path")
@@ -58,12 +59,10 @@ router.post("/product", async (req, res) => {
 router.get("/products", async (req, res) => {
     try {
         let lang = req.headers['lang'];
+        productModel.setDefaultLanguage(lang);
+
         let products = await productModel.find();
-        if (products.length == 0) return res.json([]);
-        products = JSON.stringify(products);
-        products = JSON.parse(products);
-        if (!lang) return res.json(products);
-        products = langReplace(products, lang);
+        console.log(products);
         return res.json(products);
     } catch (error) {
         console.log(error)
@@ -116,6 +115,8 @@ router.get("/product-slug/:slug", async (req, res) => {
         let color = req.query.color || "";
 
         let lang = req.headers['lang'];
+        productModel.setDefaultLanguage(lang);
+
         let product = await productModel.findOne({ slug: req.params.slug })
             .populate("parentCategory")
             .populate({
@@ -134,18 +135,6 @@ router.get("/product-slug/:slug", async (req, res) => {
             })
         // .populate("shop");
 
-        product = JSON.parse(JSON.stringify(product));
-        if (!lang) return res.json({ result: product });
-
-        product = langReplace(product, lang);
-        product.properteis = product?.properteis?.flatMap(item => item[lang]);
-        product.parentCategory = langReplace(product.parentCategory, lang);
-        product.subCategory = langReplace(product.subCategory, lang);
-        product.subCategory.subProducts = langReplace(product.subCategory?.subProducts, lang)?.filter(item => item._id !== product._id);
-        product.childCategory = langReplace(product.childCategory, lang);
-        product.childCategory.childProducts = langReplace(product.childCategory?.childProducts, lang)?.filter(item => item._id !== product._id);
-        product.brend = langReplace(product?.brend, lang);
-
         return res.status(200).json(product);
     } catch (error) {
         console.log(error);
@@ -159,6 +148,8 @@ router.get("/product-slug/:slug", async (req, res) => {
 router.get("/product/:id", async (req, res) => {
     try {
         const lang = req.headers['lang'];
+        productModel.setDefaultLanguage(lang);
+
         let color = req.query.color || "";
 
         let product = await productModel.findById(req.params.id)
@@ -168,9 +159,6 @@ router.get("/product/:id", async (req, res) => {
             .populate("brend")
         // .populate("shop");
 
-        product = JSON.parse(JSON.stringify(product));
-        product.brend = langReplace(product.brend, lang);
-        console.log(product.brend);
         return res.status(200).json(product)
     } catch (error) {
         console.log(error);

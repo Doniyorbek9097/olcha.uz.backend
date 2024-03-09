@@ -1,26 +1,19 @@
-const mongoose = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
-const { productModel } = require("./product.model");
-
-const Schema = mongoose.Schema({
+const categorySchema = Schema({
     name: {
-        uz: {
-            type: String,
-            default: ""
-        },
-        ru: {
-            type: String,
-            default: ""
-        }
+        type: String,
+        intl: true
     },
 
+    icon: String,
     image: String,
 
     left_banner: [
         {
             image: {
-                uz: String,
-                ru: String,
+                type: String,
+                intl: true
             },
             slug: String
         }
@@ -30,8 +23,8 @@ const Schema = mongoose.Schema({
     top_banner: [
         {
             image: {
-                uz: String,
-                ru: String,
+        type:String,
+        intl: true
             },
 
             slug: String
@@ -43,22 +36,29 @@ const Schema = mongoose.Schema({
     },
 
     brendId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Brend'
+        type: Schema.Types.ObjectId,
+        ref: 'Brend'
     },
 
-    parentId: {
-        type: mongoose.Schema.Types.ObjectId,
-        default: null
+
+    parent: {
+        ref: "Category",
+        type: Schema.Types.ObjectId,
     },
+
+
+    children: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Category'
+    }],
+
 
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User"
     }
 },
-
-    { 
+    {
         timestamps: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true }
@@ -67,23 +67,21 @@ const Schema = mongoose.Schema({
 );
 
 
-
-Schema.virtual("parentProducts", {
+categorySchema.virtual("parentProducts", {
     ref: "Product",
     localField: "_id",
     foreignField: "parentCategory",
 })
 
 
-
-Schema.virtual("subProducts", {
+categorySchema.virtual("subProducts", {
     ref: "Product",
     localField: "_id",
     foreignField: "subCategory",
 })
 
 
-Schema.virtual("childProducts", {
+categorySchema.virtual("childProducts", {
     ref: "Product",
     localField: "_id",
     foreignField: "childCategory",
@@ -91,4 +89,4 @@ Schema.virtual("childProducts", {
 
 
 
-module.exports = mongoose.model("Category", Schema);
+module.exports = models.Category || model("Category", categorySchema);

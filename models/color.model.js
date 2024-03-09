@@ -2,15 +2,8 @@ const mongooose = require("mongoose");
 
 const colorSchema = mongooose.Schema({
     name: {
-        uz: {
-            type: String,
-            default: ""
-        },
-        
-        ru: {
-            type: String,
-            default: ""
-        }
+        type: String,
+        intl: true
     },
 
     image: {

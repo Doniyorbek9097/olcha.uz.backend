@@ -8,7 +8,7 @@ module.exports = function nestedCategories(categories, parentId = null) {
         category = categories.filter(cat => String(cat.parentId) == String(parentId));
     }
 
-
+console.log(category);
 
 
     for (let cate of category) {

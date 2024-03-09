@@ -2,14 +2,8 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema({
     name: {
-        uz: {
-            type:String,
-            default:""
-        },
-        ru: {
-            type:String,
-            default:""
-        }
+        type: String,
+        intl: true
     },
 
     slug: {
@@ -18,26 +12,14 @@ const Schema = mongoose.Schema({
     },
 
     discription: {
-        uz: {
-            type:String,
-            default:""
-        },
-        ru: {
-            type:String,
-            default:""
-        }
+        type: String,
+        intl: true
     },
 
     properteis: [
         {
-            uz: {
-                key: String,
-                value: String
-            },
-            ru: {
-                key: String,
-                value: String
-            }
+            type: String,
+            intl: true
         }
     ],
 

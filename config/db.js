@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const mongooseIntl = require('mongoose-intl');
+mongoose.plugin(mongooseIntl, { languages: ['uz', 'ru'], defaultLanguage: 'uz', fallback: true });
 
 const connectDB = async () => {
     try {

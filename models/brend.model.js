@@ -12,13 +12,13 @@ const brendSchema = mongoose.Schema({
     },
 
     title: {
-        uz:String,
-        ru:String
+        type: String,
+        intl: true
     },
 
     image: {
-        uz: String,
-        ru: String
+        type: String,
+        intl: true
     },
 
     logo: {
@@ -27,8 +27,8 @@ const brendSchema = mongoose.Schema({
     },
 
     discription: {
-       uz:String,
-       ru:String
+        type: String,
+        intl: true
     },
 
     createdBy: {
