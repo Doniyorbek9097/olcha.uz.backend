@@ -36,11 +36,15 @@ const brendSchema = mongoose.Schema({
         ref: "User"
     }
 
-}, { timestamps: true });
+}, 
 
+{
+    timestamps: true,
+    toJSON: { virtuals: true }
+}
 
-brendSchema.set("toObject", { virtuals: true });
-brendSchema.set("toJSON", { virtuals: true });
+);
+
 
 brendSchema.virtual("products", {
     "ref": "Product",
@@ -54,5 +58,10 @@ brendSchema.virtual("categories", {
     foreignField: "brendId",
 })
 
+brendSchema.virtual("carousel", {
+    ref: "Carousel",
+    localField: "_id",
+    foreignField: "brends",
+})
 
 module.exports = mongoose.model("Brend", brendSchema);

@@ -9,27 +9,16 @@ const categorySchema = Schema({
     icon: String,
     image: String,
 
-    left_banner: [
-        {
-            image: {
-                type: String,
-                intl: true
-            },
-            slug: String
-        }
-    ],
+    // left_banner: {
+    //     type: String,
+    //     intl: true,
+    // },
 
 
-    top_banner: [
-        {
-            image: {
-        type:String,
-        intl: true
-            },
-
-            slug: String
-        }
-    ],
+    // top_banner: {
+    //     type: String,
+    //     intl: true,
+    // },
 
     slug: {
         type: String
@@ -60,11 +49,17 @@ const categorySchema = Schema({
 },
     {
         timestamps: true,
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true }
+        toJSON: { virtuals: true }
     }
 
 );
+
+
+categorySchema.virtual("carousel", {
+    ref: "Carousel",
+    localField: "_id",
+    foreignField: "categories",
+})
 
 
 categorySchema.virtual("parentProducts", {

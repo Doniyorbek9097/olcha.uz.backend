@@ -44,14 +44,14 @@ router.post("/brend", async(req, res) => {
 
 
 
-router.get("/brend/:slug", async(req, res) => {
+router.get("/brend-slug/:slug", async(req, res) => {
     try {
         const { slug } = req.params;
         const { lang } = req.headers;
-        let brend = await brendModel.findOne({slug: slug}).populate("categories", "name image slug").populate("products");
-    
+        brendModel.setDefaultLanguage(lang);
+        let brend = await brendModel.findOne({slug: slug}).populate("categories", "name image slug").populate("products").populate("carousel", "image slug");
         return res.status(200).json(brend);
-
+    
     } catch (error) {
         console.log(error);
         return res.status(500).json("Serverda Xatolik");
@@ -59,9 +59,24 @@ router.get("/brend/:slug", async(req, res) => {
 });
 
 
-router.put("/brend/:slug", async(req, res) => {
-    const { slug } = req.params;
-    const brend = await brendModel.findOne({slug: slug});
+router.get("/brend/:id", async(req, res) => {
+    try {
+        const { id } = req.params;
+        const { lang } = req.headers;
+        brendModel.setDefaultLanguage(lang);
+        let brend = await brendModel.findOne({_id: id}).populate("categories", "name image slug").populate("products");        
+        return res.status(200).json(brend.toObject());
+    
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json("Serverda Xatolik");
+    }
+});
+
+
+router.put("/brend/:id", async(req, res) => {
+    const { id } = req.params;
+    const brend = await brendModel.findOne({_id: id}).toObject();
     !req.body.image.uz && fs.unlink(path.join(__dirname, `../uploads/${path.basename(brend.image.uz)}`), (err) => err && console.log(err.message));
     req.body.image.uz = await new Base64ToFile(req).bufferInput(req.body?.image?.uz).fileName(brend.image.uz).save();
     

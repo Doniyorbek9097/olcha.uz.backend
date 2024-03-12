@@ -159,7 +159,7 @@ router.get("/product/:id", async (req, res) => {
             .populate("brend")
         // .populate("shop");
 
-        return res.status(200).json(product)
+        return res.status(200).json(product.toObject())
     } catch (error) {
         console.log(error);
     }

@@ -18,20 +18,21 @@ router.post("/carousel", async(req, res)=> {
         return res.status(200).json(result);
 
     } catch (error) {
-         const { image } = req.body;
-            if(image && image.uz) {
-                fs.unlink(
-                    path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
-                    (err) => err && console.log(err)
-                )
-            }
+        console.log(error);
+        //  const { image } = req.body;
+        //     if(image && image.uz) {
+        //         fs.unlink(
+        //             path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
+        //             (err) => err && console.log(err)
+        //         )
+        //     }
 
-            if(image && image.ru) {
-                fs.unlink(
-                    path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
-                    (err) => err && console.log(err)
-                )
-            }
+        //     if(image && image.ru) {
+        //         fs.unlink(
+        //             path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
+        //             (err) => err && console.log(err)
+        //         )
+        //     }
 
         }
 });
@@ -39,13 +40,9 @@ router.post("/carousel", async(req, res)=> {
 
 router.get("/carousel", async(req,res) => {
     try {
-        let result = await carouselModel.find();
         const lang = req.headers["lang"];
-        result = JSON.stringify(result);
-        result = JSON.parse(result);
-        if(!lang) return res.status(200).json(result);
-
-        result = langReplace(result, lang);
+        carouselModel.setDefaultLanguage(lang);        
+        let result = await carouselModel.find({categories: undefined, brends:undefined});
        return res.status(200).json(result);
 
     } catch (error) {
