@@ -1,28 +1,53 @@
 const { Schema, model, models } = require("mongoose");
 
-const categorySchema = Schema({
+const leftBannerSchema = Schema({
+    image: {
+        type: String,
+        intl: true,
+    },
+    slug: {
+        type: String
+    }
+},
+{
+    toJSON: { virtuals: true}
+}
+);
+
+
+const topBannerSchema = Schema({
+    image: {
+        type: String,
+        intl: true,
+    },
+    slug: {
+        type: String
+    }
+},
+
+{
+    toJSON: { virtuals: true}
+}
+
+);
+
+
+
+const categorySchema = new Schema({
     name: {
         type: String,
         intl: true
+    },
+    slug: {
+        type: String,
+        unique: true
     },
 
     icon: String,
     image: String,
 
-    // left_banner: {
-    //     type: String,
-    //     intl: true,
-    // },
-
-
-    // top_banner: {
-    //     type: String,
-    //     intl: true,
-    // },
-
-    slug: {
-        type: String
-    },
+    left_banner: [leftBannerSchema],
+    top_banner: [topBannerSchema],
 
     brendId: {
         type: Schema.Types.ObjectId,
@@ -55,11 +80,6 @@ const categorySchema = Schema({
 );
 
 
-categorySchema.virtual("carousel", {
-    ref: "Carousel",
-    localField: "_id",
-    foreignField: "categories",
-})
 
 
 categorySchema.virtual("parentProducts", {
@@ -84,4 +104,8 @@ categorySchema.virtual("childProducts", {
 
 
 
-module.exports = models.Category || model("Category", categorySchema);
+const categoryModel = model("Category", categorySchema);
+
+module.exports = {
+    categoryModel
+}

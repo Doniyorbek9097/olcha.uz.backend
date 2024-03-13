@@ -7,18 +7,7 @@ const Schema = new mongooose.Schema({
     },
     slug:{
         type:String,
-    },
-
-    categories: {
-        type:mongooose.Schema.Types.ObjectId,
-        ref:"Category"
-    },
-
-    brends: {
-        type:mongooose.Schema.Types.ObjectId,
-        ref:"Brend"
-    },
-
+    }
 },
 
 {

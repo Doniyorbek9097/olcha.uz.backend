@@ -42,7 +42,7 @@ router.get("/carousel", async(req,res) => {
     try {
         const lang = req.headers["lang"];
         carouselModel.setDefaultLanguage(lang);        
-        let result = await carouselModel.find({categories: undefined, brends:undefined});
+        let result = await carouselModel.find();
        return res.status(200).json(result);
 
     } catch (error) {

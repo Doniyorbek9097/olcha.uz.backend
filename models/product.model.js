@@ -1,6 +1,27 @@
-const mongoose = require("mongoose");
+const {Schema, model } = require("mongoose");
 
-const Schema = mongoose.Schema({
+
+
+const propertiesSchema = Schema({
+    key: {
+        type: String,
+        intl: true
+    },
+    value: {
+        type: String,
+        intl: true
+    }
+},
+
+{
+    toJSON: { virtuals: true}
+}
+
+);
+
+
+
+const productSchema = Schema({
     name: {
         type: String,
         intl: true
@@ -16,13 +37,7 @@ const Schema = mongoose.Schema({
         intl: true
     },
 
-    properteis: [
-        {
-            type: String,
-            intl: true
-        }
-    ],
-
+    properteis: [propertiesSchema],
 
     countInStock: {
         type: Number,
@@ -71,19 +86,19 @@ const Schema = mongoose.Schema({
     
 
     parentCategory: {
-        type:mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref:"Category",
         required:true
     },
 
     subCategory: {
-        type:mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref:"Category",
         required:true
     },
 
     childCategory: {
-        type:mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref:"Category",
         required:true
     },
@@ -94,22 +109,22 @@ const Schema = mongoose.Schema({
     },
 
     brend: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Brend"
     },
 
     // shop: {
-    //     type: mongoose.Schema.Types.ObjectId,
+    //     type: Schema.Types.ObjectId,
     //     ref: "Shop"
     // },
 
     seller: {
-        type:mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref:"User"
 
     },
 
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
 
     discount: {
         type: Number
@@ -125,10 +140,10 @@ const Schema = mongoose.Schema({
 );
 
 
-Schema.pre("save", async function(next) {
+productSchema.pre("save", async function(next) {
     this.discount = parseInt(((this.orginal_price - this.sale_price) / this.orginal_price) * 100); 
 })
 
 
 
-module.exports = mongoose.model("Product", Schema);
+module.exports = model("Product", productSchema);
