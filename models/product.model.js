@@ -21,6 +21,9 @@ const propertiesSchema = Schema({
 
 
 
+
+
+
 const productSchema = Schema({
     name: {
         type: String,

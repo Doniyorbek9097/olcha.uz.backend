@@ -86,28 +86,67 @@ router.get("/categories", async (req, res) => {
         let limit = parseInt(req.query.limit) || 1;
         let search = req.query.search || "";
 
+        let product = await categoryModel.find().populate("parentProducts").populate("subProducts").populate("childProducts");
+        const productLenth = product.flatMap(cate => cate.parentProducts);
+
+
         let categories = await categoryModel.find({ parent: undefined })
-            .populate({
-                path: "children",
-                populate: {
-                    path: "children"
-                }
-            })
-            .populate({
-                path: "parent",
-                populate: {
-                    path: "parent"
-                }
-            })
-            .populate({
-                path: "parentProducts",
-            })
-            .populate("subProducts")
-            .populate("childProducts")
-            .populate("brendId");
+        .populate({
+            path: "children",
+            populate: {
+                path: "children"
+            }
+        })
+        .populate({
+            path: "parent",
+            populate: {
+                path: "parent"
+            }
+        })
+
+        .populate({
+            path: "parentProducts",
+            match : {
+                $or: [
+                        { slug: { $regex: search, $options: "i" }},
+                    ]
+            },
+            limit: limit,
+            sort: { createdAt: -1 },
+            skip: page * limit
+        })
+        .populate({
+            path: "subProducts",
+            match : {
+                $or: [
+                        { slug: { $regex: search, $options: "i" }},
+                    ]
+            },
+            limit: limit,
+            sort: { createdAt: -1 },
+            skip: page
+        })
+        .populate({
+            path: "childProducts",
+            match : {
+                $or: [
+                        { slug: { $regex: search, $options: "i" }},
+                    ]
+            },
+            limit: limit,
+            sort: { createdAt: -1 },
+            skip: page
+        })
+        // .populate("brendId")
 
 
-        return res.json(categories);
+        return res.status(200).json({
+            totalPage: Math.ceil(productLenth.length / limit),
+            page: page + 1,
+            limit,
+            categories: categories
+        });
+
     } catch (err) {
         if (err) {
             console.log(err)
@@ -135,18 +174,18 @@ router.get("/category-slug/:slug", async (req, res) => {
         const productLenth = [...product?.parentProducts, ...product?.subProducts, ...product?.childProducts];
 
         let category = await categoryModel.findOne({ slug: req.params.slug })
-            // .populate({
-            //     path: "children",
-            //     populate: {
-            //         path: "children"
-            //     }
-            // })
-            // .populate({
-            //     path: "parent",
-            //     populate: {
-            //         path: "parent"
-            //     }
-            // })
+            .populate({
+                path: "children",
+                populate: {
+                    path: "children"
+                }
+            })
+            .populate({
+                path: "parent",
+                populate: {
+                    path: "parent"
+                }
+            })
 
             .populate({
                 path: "parentProducts",
