@@ -152,31 +152,41 @@ router.get("/category-slug/:slug", async (req, res) => {
                 path: "parentProducts",
                 match : {
                     $or: [
-                            { slug: { $regex: search }},
+                            { slug: { $regex: search, $options: "i" }},
                         ]
                 },
                 limit: limit,
                 sort: { createdAt: -1 },
                 skip: page * limit
             })
-            // .populate({
-            //     path: "subProducts",
-            //     limit: limit,
-            //     sort: { createdAt: -1 },
-            //     skip: page
-            // })
-            // .populate({
-            //     path: "childProducts",
-            //     limit: limit,
-            //     sort: { createdAt: -1 },
-            //     skip: page
-            // })
+            .populate({
+                path: "subProducts",
+                match : {
+                    $or: [
+                            { slug: { $regex: search, $options: "i" }},
+                        ]
+                },
+                limit: limit,
+                sort: { createdAt: -1 },
+                skip: page
+            })
+            .populate({
+                path: "childProducts",
+                match : {
+                    $or: [
+                            { slug: { $regex: search, $options: "i" }},
+                        ]
+                },
+                limit: limit,
+                sort: { createdAt: -1 },
+                skip: page
+            })
             // .populate("brendId")
 
 
 
         return res.status(200).json({
-            // totalPage: Math.ceil(productLenth.length / limit),
+            totalPage: Math.ceil(productLenth.length / limit),
             page: page + 1,
             limit,
             category: category
