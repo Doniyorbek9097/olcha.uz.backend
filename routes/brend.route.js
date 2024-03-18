@@ -9,12 +9,7 @@ const path = require("path");
 
 router.get("/brends", async (req, res) => {
     try {
-        const lang = req.headers["lang"];
         let brends = await brendModel.find().populate("products")
-        brends = JSON.parse(JSON.stringify(brends));
-        if(!lang) return res.status(200).send(brends);
-        
-        brends = langReplace(brends, lang);
         return res.status(200).json(brends);
     } catch (error) {
         console.log(error);
@@ -47,8 +42,6 @@ router.post("/brend", async(req, res) => {
 router.get("/brend-slug/:slug", async(req, res) => {
     try {
         const { slug } = req.params;
-        const { lang } = req.headers;
-        brendModel.setDefaultLanguage(lang);
         let brend = await brendModel.findOne({slug: slug}).populate("categories", "name image slug").populate("products").populate("carousel", "image slug");
         return res.status(200).json(brend);
     
@@ -62,9 +55,7 @@ router.get("/brend-slug/:slug", async(req, res) => {
 router.get("/brend/:id", async(req, res) => {
     try {
         const { id } = req.params;
-        const { lang } = req.headers;
-        brendModel.setDefaultLanguage(lang);
-        let brend = await brendModel.findOne({_id: id}).populate("categories", "name image slug").populate("products");        
+        let brend = await brendModel.findOne({_id: id}).populate("categories", "name image slug");        
         return res.status(200).json(brend.toObject());
     
     } catch (error) {

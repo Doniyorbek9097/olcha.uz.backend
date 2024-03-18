@@ -58,11 +58,7 @@ router.post("/product", async (req, res) => {
 // get all products 
 router.get("/products", async (req, res) => {
     try {
-        let lang = req.headers['lang'];
-        productModel.setDefaultLanguage(lang);
-
         let products = await productModel.find();
-        console.log(products);
         return res.json(products);
     } catch (error) {
         console.log(error)
@@ -114,9 +110,6 @@ router.get("/product-slug/:slug", async (req, res) => {
 
         let color = req.query.color || "";
 
-        let lang = req.headers['lang'];
-        productModel.setDefaultLanguage(lang);
-
         let product = await productModel.findOne({ slug: req.params.slug })
             .populate("parentCategory")
             .populate({
@@ -147,8 +140,6 @@ router.get("/product-slug/:slug", async (req, res) => {
 // one product by id 
 router.get("/product/:id", async (req, res) => {
     try {
-        const lang = req.headers['lang'];
-        productModel.setDefaultLanguage(lang);
 
         let color = req.query.color || "";
 

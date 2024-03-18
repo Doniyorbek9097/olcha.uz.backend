@@ -19,29 +19,27 @@ router.post("/carousel", async(req, res)=> {
 
     } catch (error) {
         console.log(error);
-        //  const { image } = req.body;
-        //     if(image && image.uz) {
-        //         fs.unlink(
-        //             path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
-        //             (err) => err && console.log(err)
-        //         )
-        //     }
+         const { image } = req.body;
+            if(image && image.uz) {
+                fs.unlink(
+                    path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
+                    (err) => err && console.log(err)
+                )
+            }
 
-        //     if(image && image.ru) {
-        //         fs.unlink(
-        //             path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
-        //             (err) => err && console.log(err)
-        //         )
-        //     }
+            if(image && image.ru) {
+                fs.unlink(
+                    path.join(__dirname, `../uploads/${path.basename(image.uz)}`),
+                    (err) => err && console.log(err)
+                )
+            }
 
         }
 });
 
 
 router.get("/carousel", async(req,res) => {
-    try {
-        const lang = req.headers["lang"];
-        carouselModel.setDefaultLanguage(lang);        
+    try {       
         let result = await carouselModel.find();
        return res.status(200).json(result);
 

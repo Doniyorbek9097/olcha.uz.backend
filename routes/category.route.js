@@ -81,8 +81,7 @@ router.get("/category", async (req, res) => {
 // Get prent all category
 router.get("/categories", async (req, res) => {
     try {
-        const lang = req.headers["lang"];
-        categoryModel.setDefaultLanguage(lang);
+
         let page = parseInt(req.query.page) - 1 || 0;
         let limit = parseInt(req.query.limit) || 1;
         let search = req.query.search || "";
@@ -128,8 +127,6 @@ router.get("/categories", async (req, res) => {
 // Get by slug name 
 router.get("/category-slug/:slug", async (req, res) => {
     try {
-        const lang = req.headers["lang"];
-        categoryModel.setDefaultLanguage(lang);
 
         let page = parseInt(req.query?.page) - 1 || 0;
         let limit = parseInt(req.query?.limit) || 2;
@@ -138,43 +135,48 @@ router.get("/category-slug/:slug", async (req, res) => {
         const productLenth = [...product?.parentProducts, ...product?.subProducts, ...product?.childProducts];
 
         let category = await categoryModel.findOne({ slug: req.params.slug })
-            .populate({
-                path: "children",
-                populate: {
-                    path: "children"
-                }
-            })
-            .populate({
-                path: "parent",
-                populate: {
-                    path: "parent"
-                }
-            })
+            // .populate({
+            //     path: "children",
+            //     populate: {
+            //         path: "children"
+            //     }
+            // })
+            // .populate({
+            //     path: "parent",
+            //     populate: {
+            //         path: "parent"
+            //     }
+            // })
 
             .populate({
                 path: "parentProducts",
+                match : {
+                    $or: [
+                            { slug: { $regex: search }},
+                        ]
+                },
                 limit: limit,
                 sort: { createdAt: -1 },
                 skip: page * limit
             })
-            .populate({
-                path: "subProducts",
-                limit: limit,
-                sort: { createdAt: -1 },
-                skip: page
-            })
-            .populate({
-                path: "childProducts",
-                limit: limit,
-                sort: { createdAt: -1 },
-                skip: page
-            })
-            .populate("brendId")
+            // .populate({
+            //     path: "subProducts",
+            //     limit: limit,
+            //     sort: { createdAt: -1 },
+            //     skip: page
+            // })
+            // .populate({
+            //     path: "childProducts",
+            //     limit: limit,
+            //     sort: { createdAt: -1 },
+            //     skip: page
+            // })
+            // .populate("brendId")
 
 
 
         return res.status(200).json({
-            totalPage: Math.ceil(productLenth.length / limit),
+            // totalPage: Math.ceil(productLenth.length / limit),
             page: page + 1,
             limit,
             category: category
@@ -291,6 +293,14 @@ router.delete("/category/:id", async (req, res) => {
         console.log(error);
         res.status(500).json("category o'chirib bo'lmadi")
     }
+});
+
+
+
+router.delete("/delete-left-banner", async(req, res) => {
+    const { category_id, banner_id } = req.body;
+    const deletedBanner = await categoryModel.updateOne({_id:category_id}, {$pull:{left_banner: {_id: banner_id}}});
+
 })
 
 
