@@ -6,5 +6,7 @@ module.exports = routes = [
     require("./shop.route"),
     require("./cart.route"),
     require("./color.route"),
-    require("./brend.route")
+    require("./brend.route"),
+    require("./order.route")
+
 ];
