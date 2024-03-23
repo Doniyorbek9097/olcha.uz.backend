@@ -1,5 +1,5 @@
 const slugify = require("slugify");
-const shopModel = require("../models/shop.model");
+const shopModel = require("../../models/shop.model");
 const router = require("express").Router();
 
 

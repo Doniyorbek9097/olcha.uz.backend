@@ -1,17 +1,17 @@
 const router = require("express").Router();
 const slugify = require("slugify");
 const mongoose = require("mongoose");
-const { categoryModel } = require("../models/category.model");
-const langReplace = require("../utils/langReplace");
-const nestedCategories = require("../utils/nestedCategories");
-const { Base64ToFile } = require("../utils/base64ToFile");
-const { isEqual } = require("../utils/isEqual");
+const { categoryModel } = require("../../models/category.model");
+const langReplace = require("../../utils/langReplace");
+const nestedCategories = require("../../utils/nestedCategories");
+const { Base64ToFile } = require("../../utils/base64ToFile");
+const { isEqual } = require("../../utils/isEqual");
 const path = require("path");
 const fs = require("fs");
 
 
 // Create new Category 
-router.post("/category", async (req, res) => {
+router.post("/category-add", async (req, res) => {
     try {
         if (!req.body.name || (!req.body.name.uz && !req.body.name.ru))
             return res.status(404).send("category name not found");
@@ -36,50 +36,7 @@ router.post("/category", async (req, res) => {
 
 
 // Get all category
-router.get("/category", async (req, res) => {
-    try {
-        const lang = req.headers["lang"];
-        let page = parseInt(req.query.page) - 1 || 0;
-        let limit = parseInt(req.query.limit) || 1;
-        let search = req.query.search || "";
-
-        let categories = await categoryModel.find()
-            .populate({
-                path: "children",
-                populate: {
-                    path: "children"
-                }
-            })
-            .populate({
-                path: "parent",
-                populate: {
-                    path: "parent"
-                }
-            })
-            .populate({
-                path: "parentProducts",
-            })
-            .populate("subProducts")
-            .populate("childProducts")
-            .populate("brendId")
-
-            .sort({ createdAt: -1 });
-
-
-        return res.json(categories);
-    } catch (err) {
-        if (err) {
-            console.log(err)
-            res.status(500).json("server ishlamayapti")
-        }
-    }
-});
-
-
-
-
-// Get prent all category
-router.get("/categories", async (req, res) => {
+router.get("/category-all", async (req, res) => {
     try {
 
         let page = parseInt(req.query.page) - 1 || 0;
@@ -144,7 +101,7 @@ router.get("/categories", async (req, res) => {
             totalPage: Math.ceil(productLenth.length / limit),
             page: page + 1,
             limit,
-            categories: categories
+            categories
         });
 
     } catch (err) {
@@ -159,88 +116,8 @@ router.get("/categories", async (req, res) => {
 
 
 
-
-
-
-
-// Get by slug name 
-router.get("/category-slug/:slug", async (req, res) => {
-    try {
-
-        let page = parseInt(req.query?.page) - 1 || 0;
-        let limit = parseInt(req.query?.limit) || 2;
-        let search = req.query?.search || "";
-        let product = await categoryModel.findOne({ slug: req.params.slug }).populate("parentProducts").populate("subProducts").populate("childProducts");
-        const productLenth = [...product?.parentProducts, ...product?.subProducts, ...product?.childProducts];
-
-        let category = await categoryModel.findOne({ slug: req.params.slug })
-            .populate({
-                path: "children",
-                populate: {
-                    path: "children"
-                }
-            })
-            .populate({
-                path: "parent",
-                populate: {
-                    path: "parent"
-                }
-            })
-
-            .populate({
-                path: "parentProducts",
-                match : {
-                    $or: [
-                            { slug: { $regex: search, $options: "i" }},
-                        ]
-                },
-                limit: limit,
-                sort: { createdAt: -1 },
-                skip: page * limit
-            })
-            .populate({
-                path: "subProducts",
-                match : {
-                    $or: [
-                            { slug: { $regex: search, $options: "i" }},
-                        ]
-                },
-                limit: limit,
-                sort: { createdAt: -1 },
-                skip: page
-            })
-            .populate({
-                path: "childProducts",
-                match : {
-                    $or: [
-                            { slug: { $regex: search, $options: "i" }},
-                        ]
-                },
-                limit: limit,
-                sort: { createdAt: -1 },
-                skip: page
-            })
-            // .populate("brendId")
-
-
-
-        return res.status(200).json({
-            totalPage: Math.ceil(productLenth.length / limit),
-            page: page + 1,
-            limit,
-            category: category
-        });
-    } catch (error) {
-        if (error) {
-            console.log(error);
-            res.status(500).json("server ishlamayapti")
-        }
-    }
-})
-
-
 // Get byId Category 
-router.get("/category/:id", async (req, res) => {
+router.get("/category-one/:id", async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
             return res.status(404).send("Category Id haqiqiy emas");
@@ -259,7 +136,7 @@ router.get("/category/:id", async (req, res) => {
 
 
 // Edit Category 
-router.put("/category/:id", async (req, res) => {
+router.put("/category-edit/:id", async (req, res) => {
     try {
         const upadted = await categoryModel.findByIdAndUpdate(req.params.id, req.body);
         return res.status(200).json(upadted);
@@ -298,7 +175,7 @@ router.put("/category/:id", async (req, res) => {
 
 
 // Delete Category 
-router.delete("/category/:id", async (req, res) => {
+router.delete("/category-delete/:id", async (req, res) => {
     try {
         const allCategoies = [];
         let parentDeleted = await categoryModel.findByIdAndDelete(req.params.id);

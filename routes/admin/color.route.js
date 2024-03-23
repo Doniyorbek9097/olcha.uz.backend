@@ -1,5 +1,5 @@
-const colorModel = require("../models/color.model");
-const langReplace = require("../utils/langReplace");
+const colorModel = require("../../models/color.model");
+const langReplace = require("../../utils/langReplace");
 
 const router = require("express").Router();
 

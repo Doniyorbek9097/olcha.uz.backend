@@ -1,11 +1,11 @@
 const router = require("express").Router();
-const productModel = require("../models/product.model");
-const categoryModel = require("../models/category.model");
+const productModel = require("../../models/product.model");
+const categoryModel = require("../../models/category.model");
 const slugify = require("slugify");
-const langReplace = require("../utils/langReplace");
+const langReplace = require("../../utils/langReplace");
 const path = require("path")
 const fs = require("fs");
-const { Base64ToFile } = require("../utils/base64ToFile");
+const { Base64ToFile } = require("../../utils/base64ToFile");
 
 // create new Product 
 router.post("/product", async (req, res) => {
@@ -141,18 +141,28 @@ router.get("/product-slug/:slug", async (req, res) => {
 router.get("/product/:id", async (req, res) => {
     try {
 
-        let color = req.query.color || "";
-
-        let product = await productModel.findById(req.params.id)
+        let product = await productModel.findOne({ slug: req.params.id })
             .populate("parentCategory")
-            .populate("subCategory")
-            .populate("childCategory")
-            .populate("brend")
+            .populate({
+                path:"subCategory",
+                populate: "subProducts"
+            })
+            .populate({
+                path: "childCategory",
+                populate: "childProducts"
+            })
+            .populate({
+                path:"brend",
+                populate: {
+                    path:'products'
+                }
+            })
         // .populate("shop");
 
-        return res.status(200).json(product.toObject())
+        return res.status(200).json(product.toObject());
     } catch (error) {
         console.log(error);
+        return res.status(500).send("Server Ishlamayapti");
     }
 });
 

@@ -1,10 +1,10 @@
-const carouselModel = require("../models/carousel.model");
+const carouselModel = require("../../models/carousel.model");
 const slugify = require("slugify");
 const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
-const langReplace = require("../utils/langReplace");
-const { Base64ToFile } = require("../utils/base64ToFile");
+const langReplace = require("../../utils/langReplace");
+const { Base64ToFile } = require("../../utils/base64ToFile");
 const router = require("express").Router();
 
 router.post("/carousel", async(req, res)=> {

@@ -1,8 +1,8 @@
-const orderModel = require("../models/order.model");
-const otpModel = require("../models/otp.model");
+const orderModel = require("../../models/order.model");
+const otpModel = require("../../models/otp.model");
 const router = require("express").Router();
-const { sendSms } = require("../utils/sendSms");
-const { generateOTP } = require("../utils/otpGenrater");
+const { sendSms } = require("../../utils/sendSms");
+const { generateOTP } = require("../../utils/otpGenrater");
 const bcrypt = require("bcrypt");
 
 router.post('/order', async (req, res) => {

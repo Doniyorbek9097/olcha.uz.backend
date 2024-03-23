@@ -3,7 +3,9 @@ const cors = require("cors");
 var bodyParser = require('body-parser');
 require("dotenv/config");
 require("./config/db");
-const routes = require("./routes");
+const adminRoutes = require("./routes/admin");
+const clientRoutes = require("./routes/client");
+
 const mongoose = require("mongoose");
 const app = express();
 
@@ -17,9 +19,9 @@ app.use("/", (req, res, next) => {
     if(lang) mongoose.setDefaultLanguage(lang);
     return next();
 })
-routes.forEach(route => app.use("/", route));
 
-
+adminRoutes.forEach(route => app.use("/api/admin/", route));
+clientRoutes.forEach(route => app.use("/api/client/", route));
 
 
 

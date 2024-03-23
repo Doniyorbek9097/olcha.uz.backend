@@ -1,13 +1,13 @@
-const tokenModel = require("../models/token.model");
-const otpModel = require("../models/otp.model");
-const userModel = require("../models/user.model");
+const tokenModel = require("../../models/token.model");
+const otpModel = require("../../models/otp.model");
+const userModel = require("../../models/user.model");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt")
 const router = require("express").Router();
-const sendEmail = require("../utils/sendEmail");
-const { checkToken } = require("../middlewares/authMiddleware");
-const { sendSms } = require("../utils/sendSms");
-const { generateOTP } = require("../utils/otpGenrater");
+const sendEmail = require("../../utils/sendEmail");
+const { checkToken } = require("../../middlewares/authMiddleware");
+const { sendSms } = require("../../utils/sendSms");
+const { generateOTP } = require("../../utils/otpGenrater");
 
 router.post("/signup", async (req, res) => {
     try {
